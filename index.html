@@ -2,143 +2,874 @@
 <html lang="ru">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="theme-color" content="#101810">
-<title>Level Up Yourself</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#08131b">
+<title>LEVEL UP YOURSELF</title>
+
 <style>
-* {box-sizing:border-box}
+:root {
+  --bg: #08131b;
+  --card: #102720;
+  --card2: #15372e;
+  --gold: #d7b66b;
+  --gold-light: #f0d99c;
+  --text: #f4f2e9;
+  --muted: #aab7ad;
+  --line: rgba(215,182,107,.25);
+  --red: #d47b72;
+}
+
+* { box-sizing: border-box; }
+
 body {
-  margin:0;
-  padding:25px 18px;
-  background:#101810;
-  color:#fff;
-  font-family:Arial,sans-serif;
+  margin: 0;
+  min-height: 100vh;
+  color: var(--text);
+  background:
+    radial-gradient(ellipse at 50% -20%, #193b35, transparent 65%),
+    var(--bg);
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
 }
-.container {max-width:500px;margin:auto}
-h1 {font-size:30px;color:#8ee6a0}
-.subtitle {color:#aaa}
-.card {
-  background:#1c291f;
-  border:1px solid #344b38;
-  border-radius:16px;
-  padding:20px;
-  margin:18px 0;
+
+button, input { font: inherit; }
+button { cursor: pointer; }
+
+.container {
+  max-width: 850px;
+  margin: auto;
+  padding: 25px 16px 55px;
 }
-h2 {font-size:20px}
-.progress {
-  height:12px;
-  background:#354439;
-  border-radius:20px;
-  overflow:hidden;
+
+header {
+  text-align: center;
+  padding: 25px 5px 30px;
 }
-#bar {
-  height:100%;
-  width:0%;
-  background:#83dc91;
-  transition:.3s;
+
+.eyebrow {
+  color: var(--gold);
+  font-size: 11px;
+  letter-spacing: 4px;
+  text-transform: uppercase;
 }
-input {
-  background:#101810;
-  border:1px solid #526957;
-  border-radius:9px;
-  padding:13px;
-  color:white;
-  width:100%;
-  font-size:16px;
+
+h1 {
+  font-family: Georgia, serif;
+  font-size: clamp(29px, 7vw, 46px);
+  font-weight: 500;
+  letter-spacing: 2px;
+  margin: 13px 0 9px;
 }
-button {
-  background:#83dc91;
-  color:#102014;
-  border:0;
-  border-radius:9px;
-  padding:12px 17px;
-  font-weight:bold;
-  margin-top:10px;
+
+.subtitle {
+  color: var(--muted);
+  font-size: 14px;
 }
-.task {
-  display:flex;
-  align-items:center;
-  gap:10px;
-  padding:12px 0;
-  border-bottom:1px solid #354439;
+
+.panel {
+  background: linear-gradient(145deg, #14352b, #0d211e);
+  border: 1px solid var(--line);
+  border-radius: 19px;
+  padding: 20px;
+  box-shadow: 0 15px 40px #0004;
 }
-.task input {width:20px}
-.done {text-decoration:line-through;color:#8b9b8e}
-.stats {color:#8ee6a0;font-size:18px}
+
+.overview {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 15px;
+  align-items: center;
+}
+
+.label {
+  color: var(--muted);
+  font-size: 12px;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+}
+
+.percent {
+  color: var(--gold-light);
+  font-family: Georgia, serif;
+  font-size: 40px;
+  margin: 5px 0 10px;
+}
+
+.track {
+  height: 8px;
+  background: #071611;
+  border-radius: 20px;
+  overflow: hidden;
+}
+
+.fill {
+  height: 100%;
+  width: 0;
+  background: linear-gradient(90deg, #a9853e, var(--gold-light));
+  transition: width .25s;
+}
+
+.stats {
+  color: var(--muted);
+  font-size: 12px;
+  text-align: right;
+  line-height: 1.8;
+}
+
+.section-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  margin: 28px 2px 15px;
+}
+
+h2 {
+  font-family: Georgia, serif;
+  font-size: 23px;
+  font-weight: 500;
+  margin: 0;
+}
+
+.btn {
+  border: 1px solid var(--line);
+  border-radius: 11px;
+  padding: 11px 15px;
+  background: linear-gradient(135deg, #d7b66b, #a9843e);
+  color: #152018;
+  font-weight: 650;
+  font-size: 13px;
+}
+
+.btn.secondary {
+  background: #102820;
+  color: var(--gold-light);
+}
+
+.btn.small {
+  padding: 7px 10px;
+  font-size: 12px;
+}
+
+.grid { display: grid; gap: 12px; }
+
+.area {
+  padding: 17px;
+  border-radius: 17px;
+  background: linear-gradient(135deg, #123329, #0e2824);
+  border: 1px solid var(--line);
+}
+
+.area-top {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.icon {
+  width: 42px;
+  height: 42px;
+  border-radius: 13px;
+  display: grid;
+  place-items: center;
+  background: #d7b66b18;
+  color: var(--gold-light);
+  font-size: 20px;
+  flex: none;
+}
+
+.area-info { flex: 1; min-width: 0; }
+
+.area-name {
+  font-family: Georgia, serif;
+  font-size: 19px;
+  overflow-wrap: anywhere;
+}
+
+.area-meta {
+  color: var(--muted);
+  font-size: 12px;
+  margin-top: 4px;
+}
+
+.area .track { margin-top: 14px; }
+
+.area-bottom {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+  margin-top: 12px;
+}
+
+.area-pct { color: var(--gold-light); }
+
+.actions {
+  display: flex;
+  gap: 7px;
+  flex-wrap: wrap;
+}
+
+.iconbtn {
+  border: 0;
+  background: transparent;
+  color: var(--gold-light);
+  padding: 4px;
+  font-size: 12px;
+}
+
+.empty {
+  color: var(--muted);
+  text-align: center;
+  padding: 28px 15px;
+  border: 1px dashed var(--line);
+  border-radius: 17px;
+  line-height: 1.6;
+}
+
+.footer {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-top: 25px;
+}
+
+.note {
+  color: #8fa096;
+  font-size: 11px;
+  line-height: 1.5;
+  text-align: center;
+  margin-top: 18px;
+}
+
+.hidden { display: none !important; }
+
+.back {
+  color: var(--gold-light);
+  background: none;
+  border: 0;
+  padding: 0;
+  margin-bottom: 18px;
+}
+
+.crumb {
+  color: var(--muted);
+  font-size: 12px;
+  margin-bottom: 10px;
+}
+
+.item {
+  display: flex;
+  align-items: flex-start;
+  gap: 11px;
+  padding: 14px 0;
+  border-bottom: 1px solid #ffffff12;
+}
+
+.item:last-child { border-bottom: 0; }
+
+.check {
+  appearance: none;
+  width: 21px;
+  height: 21px;
+  border: 1.5px solid #a98b50;
+  border-radius: 6px;
+  background: #081b17;
+  flex: none;
+  margin: 1px 0 0;
+  display: grid;
+  place-items: center;
+}
+
+.check:checked {
+  background: var(--gold);
+  border-color: var(--gold);
+}
+
+.check:checked::after {
+  content: "✓";
+  color: #132019;
+  font-weight: 900;
+}
+
+.item-main { flex: 1; min-width: 0; }
+.item-title { overflow-wrap: anywhere; }
+
+.done .item-title {
+  text-decoration: line-through;
+  color: #82968b;
+}
+
+.item-tools { display: flex; gap: 5px; }
+
+.children {
+  margin-left: 30px;
+  border-left: 1px solid var(--line);
+  padding-left: 13px;
+}
+
+.inline-add {
+  display: flex;
+  gap: 8px;
+  margin-top: 16px;
+}
+
+input[type="text"] {
+  min-width: 0;
+  flex: 1;
+  background: #071b17;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  padding: 11px 12px;
+  color: var(--text);
+  outline: none;
+}
+
+input:focus { border-color: var(--gold); }
+
+@media(max-width:520px) {
+  .container { padding: 15px 13px 40px; }
+  .panel { padding: 16px; }
+  .percent { font-size: 35px; }
+  .area-bottom {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+  .actions { margin-left: 54px; }
+}
 </style>
 </head>
+
 <body>
 <div class="container">
 
-<h1>⚡ LEVEL UP YOURSELF</h1>
-<p class="subtitle">Каждый день становись лучше, чем вчера.</p>
+<header>
+  <div class="eyebrow">Личная система развития</div>
+  <h1>LEVEL UP YOURSELF</h1>
+  <div class="subtitle">
+    Каждый день становись сильнее, умнее и свободнее.
+  </div>
+</header>
 
-<div class="card">
-<h2>Твой прогресс</h2>
-<p class="stats" id="percent">0% выполнено</p>
-<div class="progress"><div id="bar"></div></div>
-<p id="count">0 из 0 задач</p>
-</div>
+<main id="home">
 
-<div class="card">
-<h2>🎯 Мои цели на сегодня</h2>
-<div id="tasks"></div>
-<input id="newTask" placeholder="Добавить новую цель...">
-<button onclick="addTask()">+ Добавить цель</button>
-</div>
+  <section class="panel overview">
+    <div>
+      <div class="label">Общий прогресс</div>
+      <div class="percent" id="totalPct">0%</div>
+      <div class="track">
+        <div class="fill" id="totalFill"></div>
+      </div>
+    </div>
 
-<div class="card">
-<h2>🔥 Главное правило</h2>
-<p>Не обязательно быть идеальным. Главное — не останавливаться.</p>
-</div>
+    <div class="stats">
+      <div id="areaCount">0 направлений</div>
+      <div id="taskCount">0 / 0 задач</div>
+    </div>
+  </section>
+
+  <div class="section-head">
+    <h2>Мои направления</h2>
+    <button class="btn" id="addArea">＋ Добавить</button>
+  </div>
+
+  <div class="grid" id="areas"></div>
+
+  <div class="footer">
+    <button class="btn secondary small" id="exportBtn">
+      Экспорт копии
+    </button>
+
+    <button class="btn secondary small" id="importBtn">
+      Импорт копии
+    </button>
+
+    <input
+      id="importFile"
+      type="file"
+      accept="application/json"
+      class="hidden"
+    >
+  </div>
+
+  <div class="note">
+    Данные сохраняются в этом браузере.
+    Периодически сохраняй резервную копию.
+  </div>
+</main>
+
+<section id="detail" class="hidden">
+
+  <button class="back" id="backBtn">
+    ← Все направления
+  </button>
+
+  <div class="crumb">
+    LEVEL UP YOURSELF / <span id="crumbName"></span>
+  </div>
+
+  <section class="panel">
+
+    <div class="overview">
+      <div>
+        <div class="label">Прогресс направления</div>
+        <div class="percent" id="detailPct">0%</div>
+        <div class="track">
+          <div class="fill" id="detailFill"></div>
+        </div>
+      </div>
+
+      <div class="stats" id="detailStats"></div>
+    </div>
+
+    <div class="section-head">
+      <h2 id="detailTitle">Направление</h2>
+      <button class="btn secondary small" id="addTask">
+        ＋ Добавить задачу
+      </button>
+    </div>
+
+    <div id="taskTree"></div>
+
+    <div class="inline-add">
+      <input
+        type="text"
+        id="newTask"
+        placeholder="Например: выучить 10 новых слов"
+      >
+      <button class="btn small" id="submitTask">
+        Добавить
+      </button>
+    </div>
+
+  </section>
+</section>
 
 </div>
 
 <script>
-let tasks = JSON.parse(localStorage.getItem('tasks') || '[]');
+const KEY = "level-up-yourself-v1";
+
+let data = load();
+let activeId = null;
+
+function uid() {
+  return Math.random().toString(36).slice(2, 10)
+    + Date.now().toString(36);
+}
+
+function load() {
+  try {
+    return JSON.parse(localStorage.getItem(KEY)) || {
+      areas: []
+    };
+  } catch {
+    return { areas: [] };
+  }
+}
 
 function save() {
- localStorage.setItem('tasks', JSON.stringify(tasks));
- render();
+  localStorage.setItem(KEY, JSON.stringify(data));
+  render();
 }
 
-function addTask() {
- const input = document.getElementById('newTask');
- const name = input.value.trim();
- if (!name) return;
- tasks.push({name,done:false});
- input.value='';
- save();
+function escapeHTML(value) {
+  return String(value).replace(/[&<>"']/g, c => ({
+    "&": "&amp;",
+    "<": "&lt;",
+    ">": "&gt;",
+    '"': "&quot;",
+    "'": "&#39;"
+  }[c]));
 }
 
-function toggle(i) {
- tasks[i].done=!tasks[i].done;
- save();
+/*
+  Если у задачи есть вложенные задачи,
+  её прогресс считается по вложенным задачам.
+  Если вложенных задач нет — по её галочке.
+*/
+
+function totals(nodes) {
+  let done = 0;
+  let total = 0;
+
+  for (const node of nodes || []) {
+    if (node.children && node.children.length) {
+      const result = totals(node.children);
+      done += result.done;
+      total += result.total;
+    } else {
+      total++;
+      if (node.done) done++;
+    }
+  }
+
+  return { done, total };
+}
+
+function findArea(id) {
+  return data.areas.find(a => a.id === id);
 }
 
 function render() {
- const box=document.getElementById('tasks');
- box.innerHTML='';
- tasks.forEach((t,i)=>{
-  const row=document.createElement('div');
-  row.className='task';
-  const check=document.createElement('input');
-  check.type='checkbox';
-  check.checked=t.done;
-  check.onchange=()=>toggle(i);
-  const label=document.createElement('span');
-  label.textContent=t.name;
-  if(t.done) label.className='done';
-  row.append(check,label);
-  box.append(row);
- });
- const done=tasks.filter(t=>t.done).length;
- const total=tasks.length;
- const pct=total?Math.round(done/total*100):0;
- document.getElementById('percent').textContent=pct+'% выполнено';
- document.getElementById('bar').style.width=pct+'%';
- document.getElementById('count').textContent=done+' из '+total+' задач';
+  const allTasks = data.areas.flatMap(a => a.tasks);
+  const t = totals(allTasks);
+
+  const p = t.total
+    ? Math.round(t.done / t.total * 100)
+    : 0;
+
+  document.getElementById("totalPct").textContent = p + "%";
+  document.getElementById("totalFill").style.width = p + "%";
+
+  document.getElementById("areaCount").textContent =
+    data.areas.length + " направлений";
+
+  document.getElementById("taskCount").textContent =
+    t.done + " / " + t.total + " задач";
+
+  const box = document.getElementById("areas");
+  box.innerHTML = "";
+
+  if (!data.areas.length) {
+    box.innerHTML = `
+      <div class="empty">
+        Пока здесь чистый лист.<br>
+        Создай первое направление — например,
+        «Английский язык».
+      </div>
+    `;
+  }
+
+  data.areas.forEach(area => {
+    const q = totals(area.tasks);
+    const percent = q.total
+      ? Math.round(q.done / q.total * 100)
+      : 0;
+
+    const el = document.createElement("article");
+    el.className = "area";
+
+    el.innerHTML = `
+      <div class="area-top">
+        <div class="icon">✦</div>
+
+        <div class="area-info">
+          <div class="area-name">
+            ${escapeHTML(area.name)}
+          </div>
+
+          <div class="area-meta">
+            ${q.done} из ${q.total} задач выполнено
+          </div>
+        </div>
+
+        <div class="area-pct">${percent}%</div>
+      </div>
+
+      <div class="track">
+        <div class="fill" style="width:${percent}%"></div>
+      </div>
+
+      <div class="area-bottom">
+        <button class="btn secondary small"
+          data-open="${area.id}">
+          Открыть направление →
+        </button>
+
+        <div class="actions">
+          <button class="iconbtn" data-rename="${area.id}">
+            Переименовать
+          </button>
+
+          <button class="iconbtn" data-delete="${area.id}">
+            Удалить
+          </button>
+        </div>
+      </div>
+    `;
+
+    box.appendChild(el);
+  });
+
+  if (activeId) {
+    const area = findArea(activeId);
+
+    if (area) renderDetail(area);
+    else showHome();
+  }
 }
+
+function showHome() {
+  activeId = null;
+
+  document.getElementById("home").classList.remove("hidden");
+  document.getElementById("detail").classList.add("hidden");
+
+  render();
+}
+
+function openArea(id) {
+  activeId = id;
+
+  document.getElementById("home").classList.add("hidden");
+  document.getElementById("detail").classList.remove("hidden");
+
+  render();
+}
+
+function renderDetail(area) {
+  const t = totals(area.tasks);
+
+  const percent = t.total
+    ? Math.round(t.done / t.total * 100)
+    : 0;
+
+  document.getElementById("crumbName").textContent = area.name;
+  document.getElementById("detailTitle").textContent = area.name;
+  document.getElementById("detailPct").textContent = percent + "%";
+  document.getElementById("detailFill").style.width = percent + "%";
+
+  document.getElementById("detailStats").textContent =
+    t.done + " / " + t.total + " задач";
+
+  const tree = document.getElementById("taskTree");
+  tree.innerHTML = "";
+
+  if (!area.tasks.length) {
+    tree.innerHTML = `
+      <div class="empty">
+        Добавь первую задачу или тему ниже.
+      </div>
+    `;
+  } else {
+    area.tasks.forEach(node => {
+      tree.appendChild(makeNode(node, area.tasks));
+    });
+  }
+}
+
+function makeNode(node, list) {
+  const row = document.createElement("div");
+
+  row.className = "item" + (node.done ? " done" : "");
+
+  row.innerHTML = `
+    <input
+      class="check"
+      type="checkbox"
+      ${node.done ? "checked" : ""}
+      aria-label="Выполнено"
+    >
+
+    <div class="item-main">
+      <div class="item-title">
+        ${escapeHTML(node.name)}
+      </div>
+
+      ${
+        node.children && node.children.length
+        ? `<div class="area-meta">
+            ${totals(node.children).done}
+            /
+            ${totals(node.children).total}
+            подзадач
+          </div>`
+        : ""
+      }
+    </div>
+
+    <div class="item-tools">
+      <button class="iconbtn" data-addchild title="Добавить подзадачу">
+        ＋
+      </button>
+
+      <button class="iconbtn" data-edit title="Изменить">
+        ✎
+      </button>
+
+      <button class="iconbtn" data-remove title="Удалить">
+        ×
+      </button>
+    </div>
+  `;
+
+  row.querySelector(".check").addEventListener("change", e => {
+    node.done = e.target.checked;
+    save();
+  });
+
+  row.querySelector("[data-addchild]").onclick = () => {
+    ask("Название подзадачи", name => {
+      node.children = node.children || [];
+
+      node.children.push({
+        id: uid(),
+        name,
+        done: false,
+        children: []
+      });
+
+      save();
+    });
+  };
+
+  row.querySelector("[data-edit]").onclick = () => {
+    ask("Новое название", name => {
+      node.name = name;
+      save();
+    }, node.name);
+  };
+
+  row.querySelector("[data-remove]").onclick = () => {
+    if (confirm("Удалить эту задачу вместе с вложенными?")) {
+      list.splice(list.indexOf(node), 1);
+      save();
+    }
+  };
+
+  const wrapper = document.createElement("div");
+  wrapper.appendChild(row);
+
+  if (node.children && node.children.length) {
+    const children = document.createElement("div");
+    children.className = "children";
+
+    node.children.forEach(child => {
+      children.appendChild(makeNode(child, node.children));
+    });
+
+    wrapper.appendChild(children);
+  }
+
+  return wrapper;
+}
+
+function ask(title, callback, previous = "") {
+  const answer = prompt(title, previous);
+
+  if (answer && answer.trim()) {
+    callback(answer.trim());
+  }
+}
+
+document.getElementById("addArea").onclick = () => {
+  ask("Название нового направления", name => {
+    data.areas.push({
+      id: uid(),
+      name,
+      tasks: []
+    });
+
+    save();
+  });
+};
+
+document.getElementById("areas").addEventListener("click", e => {
+  const button = e.target.closest("button");
+  if (!button) return;
+
+  if (button.dataset.open) {
+    openArea(button.dataset.open);
+  }
+
+  if (button.dataset.rename) {
+    const area = findArea(button.dataset.rename);
+
+    ask("Переименовать направление", name => {
+      area.name = name;
+      save();
+    }, area.name);
+  }
+
+  if (button.dataset.delete) {
+    const area = findArea(button.dataset.delete);
+
+    if (confirm(
+      `Удалить направление «${area.name}» и все его задачи?`
+    )) {
+      data.areas = data.areas.filter(
+        a => a.id !== area.id
+      );
+
+      save();
+    }
+  }
+});
+
+document.getElementById("backBtn").onclick = showHome;
+
+function addRootTask() {
+  const input = document.getElementById("newTask");
+  const name = input.value.trim();
+
+  if (!name) return;
+
+  const area = findArea(activeId);
+
+  area.tasks.push({
+    id: uid(),
+    name,
+    done: false,
+    children: []
+  });
+
+  input.value = "";
+  save();
+}
+
+document.getElementById("submitTask").onclick = addRootTask;
+
+document.getElementById("newTask").addEventListener("keydown", e => {
+  if (e.key === "Enter") addRootTask();
+});
+
+document.getElementById("addTask").onclick = () => {
+  document.getElementById("newTask").focus();
+};
+
+/* Резервная копия */
+
+document.getElementById("exportBtn").onclick = () => {
+  const blob = new Blob(
+    [JSON.stringify(data, null, 2)],
+    { type: "application/json" }
+  );
+
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement("a");
+
+  link.href = url;
+  link.download = "level-up-yourself-backup.json";
+  link.click();
+
+  URL.revokeObjectURL(url);
+};
+
+document.getElementById("importBtn").onclick = () => {
+  document.getElementById("importFile").click();
+};
+
+document.getElementById("importFile").onchange = async e => {
+  const file = e.target.files[0];
+  if (!file) return;
+
+  try {
+    const imported = JSON.parse(await file.text());
+
+    if (!Array.isArray(imported.areas)) {
+      throw new Error("Invalid backup");
+    }
+
+    if (confirm("Заменить текущие данные данными из копии?")) {
+      data = imported;
+      save();
+    }
+  } catch {
+    alert("Не удалось прочитать копию. Проверь файл.");
+  }
+
+  e.target.value = "";
+};
 
 render();
 </script>
