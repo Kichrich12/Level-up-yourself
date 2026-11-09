@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#101810">
+<title>Level Up Yourself</title>
+<style>
+* {box-sizing:border-box}
+body {
+  margin:0;
+  padding:25px 18px;
+  background:#101810;
+  color:#fff;
+  font-family:Arial,sans-serif;
+}
+.container {max-width:500px;margin:auto}
+h1 {font-size:30px;color:#8ee6a0}
+.subtitle {color:#aaa}
+.card {
+  background:#1c291f;
+  border:1px solid #344b38;
+  border-radius:16px;
+  padding:20px;
+  margin:18px 0;
+}
+h2 {font-size:20px}
+.progress {
+  height:12px;
+  background:#354439;
+  border-radius:20px;
+  overflow:hidden;
+}
+#bar {
+  height:100%;
+  width:0%;
+  background:#83dc91;
+  transition:.3s;
+}
+input {
+  background:#101810;
+  border:1px solid #526957;
+  border-radius:9px;
+  padding:13px;
+  color:white;
+  width:100%;
+  font-size:16px;
+}
+button {
+  background:#83dc91;
+  color:#102014;
+  border:0;
+  border-radius:9px;
+  padding:12px 17px;
+  font-weight:bold;
+  margin-top:10px;
+}
+.task {
+  display:flex;
+  align-items:center;
+  gap:10px;
+  padding:12px 0;
+  border-bottom:1px solid #354439;
+}
+.task input {width:20px}
+.done {text-decoration:line-through;color:#8b9b8e}
+.stats {color:#8ee6a0;font-size:18px}
+</style>
+</head>
+<body>
+<div class="container">
+
+<h1>⚡ LEVEL UP YOURSELF</h1>
+<p class="subtitle">Каждый день становись лучше, чем вчера.</p>
+
+<div class="card">
+<h2>Твой прогресс</h2>
+<p class="stats" id="percent">0% выполнено</p>
+<div class="progress"><div id="bar"></div></div>
+<p id="count">0 из 0 задач</p>
+</div>
+
+<div class="card">
+<h2>🎯 Мои цели на сегодня</h2>
+<div id="tasks"></div>
+<input id="newTask" placeholder="Добавить новую цель...">
+<button onclick="addTask()">+ Добавить цель</button>
+</div>
+
+<div class="card">
+<h2>🔥 Главное правило</h2>
+<p>Не обязательно быть идеальным. Главное — не останавливаться.</p>
+</div>
+
+</div>
+
+<script>
+let tasks = JSON.parse(localStorage.getItem('tasks') || '[]');
+
+function save() {
+ localStorage.setItem('tasks', JSON.stringify(tasks));
+ render();
+}
+
+function addTask() {
+ const input = document.getElementById('newTask');
+ const name = input.value.trim();
+ if (!name) return;
+ tasks.push({name,done:false});
+ input.value='';
+ save();
+}
+
+function toggle(i) {
+ tasks[i].done=!tasks[i].done;
+ save();
+}
+
+function render() {
+ const box=document.getElementById('tasks');
+ box.innerHTML='';
+ tasks.forEach((t,i)=>{
+  const row=document.createElement('div');
+  row.className='task';
+  const check=document.createElement('input');
+  check.type='checkbox';
+  check.checked=t.done;
+  check.onchange=()=>toggle(i);
+  const label=document.createElement('span');
+  label.textContent=t.name;
+  if(t.done) label.className='done';
+  row.append(check,label);
+  box.append(row);
+ });
+ const done=tasks.filter(t=>t.done).length;
+ const total=tasks.length;
+ const pct=total?Math.round(done/total*100):0;
+ document.getElementById('percent').textContent=pct+'% выполнено';
+ document.getElementById('bar').style.width=pct+'%';
+ document.getElementById('count').textContent=done+' из '+total+' задач';
+}
+
+render();
+</script>
+</body>
+</html>
