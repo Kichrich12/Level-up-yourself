@@ -244,6 +244,98 @@ h2 {
   margin-top: 18px;
 }
 
+.history-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+  margin: 18px 0;
+}
+
+.history-stat {
+  background: #071b17;
+  border: 1px solid var(--line);
+  border-radius: 13px;
+  padding: 13px 10px;
+}
+
+.history-number {
+  color: var(--gold-light);
+  font-family: Georgia, serif;
+  font-size: 27px;
+}
+
+.history-label {
+  color: var(--muted);
+  font-size: 11px;
+  margin-top: 4px;
+}
+
+.history-bars {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 8px;
+  align-items: end;
+  height: 115px;
+  margin: 15px 0 5px;
+}
+
+.history-day {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: end;
+  gap: 7px;
+  height: 100%;
+  min-width: 0;
+}
+
+.history-bar-track {
+  height: 82px;
+  width: 100%;
+  display: flex;
+  align-items: end;
+  background: #071611;
+  border-radius: 7px;
+  overflow: hidden;
+}
+
+.history-bar-fill {
+  width: 100%;
+  min-height: 3px;
+  background: linear-gradient(180deg, var(--gold-light), #987438);
+  border-radius: 7px;
+}
+
+.history-day-label {
+  color: var(--muted);
+  font-size: 10px;
+}
+
+.history-entry {
+  padding: 12px 0;
+  border-bottom: 1px solid #ffffff12;
+}
+
+.history-entry:last-child { border-bottom: 0; }
+
+.history-entry-title { font-size: 14px; }
+.history-entry-meta {
+  color: var(--muted);
+  font-size: 11px;
+  margin-top: 4px;
+}
+
+.history-empty {
+  color: var(--muted);
+  text-align: center;
+  padding: 22px 10px;
+  line-height: 1.6;
+}
+
+@media(max-width:380px) {
+  .history-grid { grid-template-columns: repeat(2, 1fr); }
+}
+
 .hidden { display: none !important; }
 
 .back {
@@ -378,6 +470,10 @@ input:focus { border-color: var(--gold); }
   <div class="grid" id="areas"></div>
 
   <div class="footer">
+    <button class="btn secondary small" id="statsBtn">
+      ◷ Статистика
+    </button>
+
     <button class="btn secondary small" id="exportBtn">
       Экспорт копии
     </button>
@@ -447,6 +543,52 @@ input:focus { border-color: var(--gold); }
   </section>
 </section>
 
+<section id="statistics" class="hidden">
+  <button class="back" id="backFromStats">← На главную</button>
+  <div class="crumb">LEVEL UP YOURSELF / СТАТИСТИКА</div>
+  <section class="panel">
+    <div class="section-head" style="margin-top:0">
+      <h2>Моя история</h2>
+    </div>
+    <div class="history-grid">
+      <div class="history-stat">
+        <div class="history-number" id="historyToday">0</div>
+        <div class="history-label">Сегодня</div>
+      </div>
+      <div class="history-stat">
+        <div class="history-number" id="historyWeek">0</div>
+        <div class="history-label">За 7 дней</div>
+      </div>
+      <div class="history-stat">
+        <div class="history-number" id="historyMonth">0</div>
+        <div class="history-label">За 30 дней</div>
+      </div>
+      <div class="history-stat">
+        <div class="history-number" id="historyAll">0</div>
+        <div class="history-label">За всё время</div>
+      </div>
+      <div class="history-stat">
+        <div class="history-number" id="historyReopened">0</div>
+        <div class="history-label">Возвращено в работу</div>
+      </div>
+      <div class="history-stat">
+        <div class="history-number" id="historyActiveDays">0</div>
+        <div class="history-label">Активных дней за 30 дней</div>
+      </div>
+    </div>
+
+    <div class="section-head">
+      <h2>Активность за 7 дней</h2>
+    </div>
+    <div class="history-bars" id="historyChart"></div>
+
+    <div class="section-head">
+      <h2>Последние действия</h2>
+    </div>
+    <div id="historyLog"></div>
+  </section>
+</section>
+
 </div>
 
 <script>
@@ -462,17 +604,131 @@ function uid() {
 
 function load() {
   try {
-    return JSON.parse(localStorage.getItem(KEY)) || {
-      areas: []
+    const stored = JSON.parse(localStorage.getItem(KEY)) || {};
+    return {
+      areas: Array.isArray(stored.areas) ? stored.areas : [],
+      history: Array.isArray(stored.history) ? stored.history : []
     };
   } catch {
-    return { areas: [] };
+    return { areas: [], history: [] };
   }
 }
 
 function save() {
+  if (!Array.isArray(data.history)) data.history = [];
   localStorage.setItem(KEY, JSON.stringify(data));
   render();
+}
+
+function addHistoryEvent(type, area, task) {
+  data.history = Array.isArray(data.history) ? data.history : [];
+  data.history.push({
+    id: uid(),
+    type,
+    areaId: area.id,
+    areaName: area.name,
+    taskId: task.id,
+    taskName: task.name,
+    timestamp: new Date().toISOString()
+  });
+}
+
+function dateKey(date) {
+  return date.getFullYear() + "-" +
+    String(date.getMonth() + 1).padStart(2, "0") + "-" +
+    String(date.getDate()).padStart(2, "0");
+}
+
+function renderStatistics() {
+  const events = (data.history || []).filter(event =>
+    event && (event.type === "completed" || event.type === "reopened")
+      && !Number.isNaN(new Date(event.timestamp).getTime())
+  );
+  const now = new Date();
+  const startToday = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+  const startWeek = new Date(startToday);
+  startWeek.setDate(startWeek.getDate() - 6);
+  const startMonth = new Date(startToday);
+  startMonth.setDate(startMonth.getDate() - 29);
+
+  const completed = events.filter(event => event.type === "completed");
+  const reopened = events.filter(event => event.type === "reopened");
+  const inRange = (event, start) => new Date(event.timestamp) >= start;
+
+  document.getElementById("historyToday").textContent =
+    completed.filter(event => inRange(event, startToday)).length;
+  document.getElementById("historyWeek").textContent =
+    completed.filter(event => inRange(event, startWeek)).length;
+  document.getElementById("historyMonth").textContent =
+    completed.filter(event => inRange(event, startMonth)).length;
+  document.getElementById("historyAll").textContent = completed.length;
+  document.getElementById("historyReopened").textContent = reopened.length;
+
+  const activeDays = new Set(completed
+    .filter(event => inRange(event, startMonth))
+    .map(event => dateKey(new Date(event.timestamp))));
+  document.getElementById("historyActiveDays").textContent = activeDays.size;
+
+  const days = [];
+  for (let i = 6; i >= 0; i--) {
+    const day = new Date(startToday);
+    day.setDate(day.getDate() - i);
+    const key = dateKey(day);
+    days.push({
+      key,
+      label: day.toLocaleDateString("ru-RU", { weekday: "short" }),
+      count: completed.filter(event =>
+        dateKey(new Date(event.timestamp)) === key
+      ).length
+    });
+  }
+
+  const maxCount = Math.max(1, ...days.map(day => day.count));
+  document.getElementById("historyChart").innerHTML = days.map(day => {
+    const height = day.count ? Math.max(7, day.count / maxCount * 100) : 3;
+    return `
+      <div class="history-day">
+        <div class="history-bar-track">
+          <div class="history-bar-fill" style="height:${height}%"></div>
+        </div>
+        <div class="history-day-label">${escapeHTML(day.label)}</div>
+      </div>
+    `;
+  }).join("");
+
+  const log = document.getElementById("historyLog");
+  const recent = [...events].sort((a, b) =>
+    new Date(b.timestamp) - new Date(a.timestamp)
+  ).slice(0, 30);
+
+  if (!recent.length) {
+    log.innerHTML = `
+      <div class="history-empty">
+        Здесь пока нет записей.<br>
+        Выполни первую задачу — и она появится в истории.
+      </div>
+    `;
+    return;
+  }
+
+  log.innerHTML = recent.map(event => {
+    const completedEvent = event.type === "completed";
+    const date = new Date(event.timestamp).toLocaleString("ru-RU", {
+      day: "numeric", month: "short", hour: "2-digit", minute: "2-digit"
+    });
+    return `
+      <div class="history-entry">
+        <div class="history-entry-title">
+          ${completedEvent ? "✓" : "↺"}
+          ${escapeHTML(event.taskName || "Задача")}
+        </div>
+        <div class="history-entry-meta">
+          ${escapeHTML(event.areaName || "Направление")} ·
+          ${completedEvent ? "Выполнено" : "Возвращено в работу"} · ${date}
+        </div>
+      </div>
+    `;
+  }).join("");
 }
 
 function escapeHTML(value) {
@@ -729,11 +985,29 @@ function makeNode(node, list, parent = null, ancestors = []) {
   `;
 
   row.querySelector(".check").addEventListener("change", e => {
-    setNodeDone(node, e.target.checked);
-
-    // Поднимаемся вверх: родитель отмечается только когда выполнены все его дети.
     const area = findArea(activeId);
-    if (area) syncTree(area.tasks);
+    const wasComplete = isNodeComplete(node);
+    const willBeComplete = e.target.checked;
+
+    setNodeDone(node, willBeComplete);
+
+    // Историю пишем только для конечных задач, чтобы родительские
+    // галочки не дублировали выполненные подзадачи.
+    const recordLeafChanges = task => {
+      if (task.children && task.children.length) {
+        task.children.forEach(recordLeafChanges);
+      } else if (wasComplete !== willBeComplete) {
+        addHistoryEvent(willBeComplete ? "completed" : "reopened", area, task);
+      }
+    };
+    if (area) {
+      if (node.children && node.children.length) {
+        node.children.forEach(recordLeafChanges);
+      } else if (wasComplete !== willBeComplete) {
+        addHistoryEvent(willBeComplete ? "completed" : "reopened", area, node);
+      }
+      syncTree(area.tasks);
+    }
 
     save();
   });
@@ -838,6 +1112,21 @@ document.getElementById("areas").addEventListener("click", e => {
 
 document.getElementById("backBtn").onclick = showHome;
 
+function showStatistics() {
+  document.getElementById("home").classList.add("hidden");
+  document.getElementById("detail").classList.add("hidden");
+  document.getElementById("statistics").classList.remove("hidden");
+  renderStatistics();
+}
+
+function backFromStatistics() {
+  document.getElementById("statistics").classList.add("hidden");
+  document.getElementById("home").classList.remove("hidden");
+}
+
+document.getElementById("statsBtn").onclick = showStatistics;
+document.getElementById("backFromStats").onclick = backFromStatistics;
+
 function addRootTask() {
   const input = document.getElementById("newTask");
   const name = input.value.trim();
@@ -883,8 +1172,9 @@ function copyTaskForBackup(task) {
 document.getElementById("exportBtn").onclick = () => {
   const backup = {
     app: "LEVEL UP YOURSELF",
-    version: 2,
+    version: 3,
     exportedAt: new Date().toISOString(),
+    history: (data.history || []).map(event => ({ ...event })),
     areas: (data.areas || []).map(area => ({
       id: area.id || uid(),
       name: String(area.name || ""),
@@ -943,6 +1233,23 @@ document.getElementById("importFile").onchange = async e => {
       throw new Error("В файле не найдены направления");
     }
 
+    const restoredHistory = Array.isArray(imported.history)
+      ? imported.history.map(event => {
+          if (!event || typeof event !== "object") {
+            throw new Error("Некорректная запись истории");
+          }
+          return {
+            id: typeof event.id === "string" ? event.id : uid(),
+            type: event.type === "reopened" ? "reopened" : "completed",
+            areaId: typeof event.areaId === "string" ? event.areaId : "",
+            areaName: String(event.areaName || ""),
+            taskId: typeof event.taskId === "string" ? event.taskId : "",
+            taskName: String(event.taskName || ""),
+            timestamp: new Date(event.timestamp).toISOString()
+          };
+        })
+      : [];
+
     const restoredAreas = importedAreas.map(area => {
       if (!area || typeof area.name !== "string") {
         throw new Error("Некорректное направление в резервной копии");
@@ -968,10 +1275,11 @@ document.getElementById("importFile").onchange = async e => {
       "Импортировать " + restoredAreas.length + " направлений и " +
       taskCount + " задач/подзадач? Текущие данные будут заменены."
     )) {
-      data = { areas: restoredAreas };
+      data = { areas: restoredAreas, history: restoredHistory };
       save();
       alert("Импорт завершён: загружено " + restoredAreas.length +
-        " направлений и " + taskCount + " задач/подзадач.");
+        " направлений, " + taskCount + " задач/подзадач и " +
+        restoredHistory.length + " записей истории.");
     }
   } catch (error) {
     alert("Не удалось импортировать копию: " +
