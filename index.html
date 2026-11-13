@@ -869,9 +869,32 @@ document.getElementById("addTask").onclick = () => {
 
 /* Резервная копия */
 
+// Резервная копия включает направления, задачи и подзадачи любой глубины.
+function copyTaskForBackup(task) {
+  return {
+    id: task.id || uid(),
+    name: String(task.name || ""),
+    done: !!task.done,
+    children: (Array.isArray(task.children) ? task.children : [])
+      .map(copyTaskForBackup)
+  };
+}
+
 document.getElementById("exportBtn").onclick = () => {
+  const backup = {
+    app: "LEVEL UP YOURSELF",
+    version: 2,
+    exportedAt: new Date().toISOString(),
+    areas: (data.areas || []).map(area => ({
+      id: area.id || uid(),
+      name: String(area.name || ""),
+      tasks: (Array.isArray(area.tasks) ? area.tasks : [])
+        .map(copyTaskForBackup)
+    }))
+  };
+
   const blob = new Blob(
-    [JSON.stringify(data, null, 2)],
+    [JSON.stringify(backup, null, 2)],
     { type: "application/json" }
   );
 
@@ -882,12 +905,27 @@ document.getElementById("exportBtn").onclick = () => {
   link.download = "level-up-yourself-backup.json";
   link.click();
 
-  URL.revokeObjectURL(url);
+  setTimeout(() => URL.revokeObjectURL(url), 1000);
 };
 
 document.getElementById("importBtn").onclick = () => {
   document.getElementById("importFile").click();
 };
+
+// Проверяет и восстанавливает дерево задач, не теряя вложенные уровни.
+function restoreTaskFromBackup(task) {
+  if (!task || typeof task !== "object" || typeof task.name !== "string") {
+    throw new Error("Некорректная задача в резервной копии");
+  }
+
+  return {
+    id: typeof task.id === "string" ? task.id : uid(),
+    name: task.name,
+    done: !!task.done,
+    children: (Array.isArray(task.children) ? task.children : [])
+      .map(restoreTaskFromBackup)
+  };
+}
 
 document.getElementById("importFile").onchange = async e => {
   const file = e.target.files[0];
@@ -895,17 +933,49 @@ document.getElementById("importFile").onchange = async e => {
 
   try {
     const imported = JSON.parse(await file.text());
+    const importedAreas = Array.isArray(imported.areas)
+      ? imported.areas
+      : (imported.data && Array.isArray(imported.data.areas)
+          ? imported.data.areas
+          : null);
 
-    if (!Array.isArray(imported.areas)) {
-      throw new Error("Invalid backup");
+    if (!importedAreas) {
+      throw new Error("В файле не найдены направления");
     }
 
-    if (confirm("Заменить текущие данные данными из копии?")) {
-      data = imported;
+    const restoredAreas = importedAreas.map(area => {
+      if (!area || typeof area.name !== "string") {
+        throw new Error("Некорректное направление в резервной копии");
+      }
+
+      return {
+        id: typeof area.id === "string" ? area.id : uid(),
+        name: area.name,
+        tasks: (Array.isArray(area.tasks) ? area.tasks : [])
+          .map(restoreTaskFromBackup)
+      };
+    });
+
+    const taskCount = restoredAreas.reduce((sum, area) => {
+      const countTasks = nodes => (nodes || []).reduce(
+        (count, node) => count + 1 + countTasks(node.children),
+        0
+      );
+      return sum + countTasks(area.tasks);
+    }, 0);
+
+    if (confirm(
+      "Импортировать " + restoredAreas.length + " направлений и " +
+      taskCount + " задач/подзадач? Текущие данные будут заменены."
+    )) {
+      data = { areas: restoredAreas };
       save();
+      alert("Импорт завершён: загружено " + restoredAreas.length +
+        " направлений и " + taskCount + " задач/подзадач.");
     }
-  } catch {
-    alert("Не удалось прочитать копию. Проверь файл.");
+  } catch (error) {
+    alert("Не удалось импортировать копию: " +
+      (error && error.message ? error.message : "проверь файл."));
   }
 
   e.target.value = "";
