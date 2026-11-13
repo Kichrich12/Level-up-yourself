@@ -325,6 +325,29 @@ h2 {
   margin-top: 4px;
 }
 
+.direction-stat-card {
+  padding: 15px;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  background: linear-gradient(135deg, #123329, #0e2824);
+  cursor: pointer;
+  text-align: left;
+  color: var(--text);
+  width: 100%;
+}
+.direction-stat-card:active { transform: scale(.99); }
+.direction-stat-top { display:flex; align-items:center; justify-content:space-between; gap:10px; }
+.direction-stat-name { font-family:Georgia,serif; font-size:17px; overflow-wrap:anywhere; }
+.direction-stat-count { color:var(--gold-light); font-size:13px; white-space:nowrap; }
+.direction-stat-meta { color:var(--muted); font-size:11px; margin-top:8px; }
+.direction-stat-card .track { margin-top:12px; }
+.direction-stat-open { color:var(--gold-light); font-size:11px; margin-top:10px; }
+.direction-task-row { display:flex; justify-content:space-between; gap:12px; padding:10px 0; border-bottom:1px solid #ffffff12; font-size:13px; }
+.direction-task-row:last-child { border-bottom:0; }
+.direction-task-name { min-width:0; overflow-wrap:anywhere; }
+.direction-task-state { color:var(--muted); white-space:nowrap; font-size:11px; }
+.direction-task-state.is-done { color:var(--gold-light); }
+
 .history-empty {
   color: var(--muted);
   text-align: center;
@@ -583,6 +606,15 @@ input:focus { border-color: var(--gold); }
     <div class="history-bars" id="historyChart"></div>
 
     <div class="section-head">
+      <h2>Статистика направлений</h2>
+    </div>
+    <div class="history-empty" id="directionStatsHint">
+      Нажми на направление, чтобы открыть подробную статистику.
+    </div>
+    <div class="grid" id="directionStatsList"></div>
+    <div id="directionStatsDetail" class="hidden"></div>
+
+    <div class="section-head">
       <h2>Последние действия</h2>
     </div>
     <div id="historyLog"></div>
@@ -639,7 +671,109 @@ function dateKey(date) {
     String(date.getDate()).padStart(2, "0");
 }
 
+let statsAreaId = null;
+
+function getLeafTasks(nodes, path = []) {
+  const result = [];
+  (nodes || []).forEach(node => {
+    const nextPath = [...path, node.name || "Задача"];
+    if (node.children && node.children.length) result.push(...getLeafTasks(node.children, nextPath));
+    else result.push({ task: node, path: nextPath });
+  });
+  return result;
+}
+
+function renderDirectionStatistics() {
+  const list = document.getElementById("directionStatsList");
+  const detail = document.getElementById("directionStatsDetail");
+  const hint = document.getElementById("directionStatsHint");
+
+  if (statsAreaId) {
+    const area = findArea(statsAreaId);
+    if (!area) statsAreaId = null;
+    else {
+      list.classList.add("hidden");
+      hint.classList.add("hidden");
+      detail.classList.remove("hidden");
+      const leaves = getLeafTasks(area.tasks);
+      const done = leaves.filter(item => item.task.done).length;
+      const total = leaves.length;
+      const percent = total ? Math.round(done / total * 100) : 0;
+      const areaEvents = (data.history || []).filter(event =>
+        event && event.areaId === area.id
+        && (event.type === "completed" || event.type === "reopened")
+        && !Number.isNaN(new Date(event.timestamp).getTime())
+      );
+      const completedEvents = areaEvents.filter(event => event.type === "completed").length;
+      const reopenedEvents = areaEvents.filter(event => event.type === "reopened").length;
+      const recent = [...areaEvents].sort((a,b) => new Date(b.timestamp)-new Date(a.timestamp)).slice(0,15);
+
+      detail.innerHTML = `
+        <button class="back" id="directionStatsBack">← Все направления</button>
+        <div class="crumb">ПОДРОБНАЯ СТАТИСТИКА</div>
+        <section class="panel">
+          <div class="section-head" style="margin-top:0"><h2>${escapeHTML(area.name)}</h2></div>
+          <div class="overview">
+            <div>
+              <div class="label">Текущий прогресс</div>
+              <div class="percent">${percent}%</div>
+              <div class="track"><div class="fill" style="width:${percent}%"></div></div>
+            </div>
+            <div class="stats">${done} / ${total}<br>задач выполнено</div>
+          </div>
+          <div class="history-grid">
+            <div class="history-stat"><div class="history-number">${done}</div><div class="history-label">Сейчас выполнено</div></div>
+            <div class="history-stat"><div class="history-number">${total-done}</div><div class="history-label">Осталось</div></div>
+            <div class="history-stat"><div class="history-number">${completedEvents}</div><div class="history-label">Выполнений за всё время</div></div>
+            <div class="history-stat"><div class="history-number">${reopenedEvents}</div><div class="history-label">Возвратов в работу</div></div>
+          </div>
+          <div class="section-head"><h2>Задачи направления</h2></div>
+          ${leaves.length ? leaves.map(item => `
+            <div class="direction-task-row">
+              <div class="direction-task-name">${escapeHTML(item.path.join(" / "))}</div>
+              <div class="direction-task-state ${item.task.done ? "is-done" : ""}">${item.task.done ? "✓ Готово" : "В работе"}</div>
+            </div>`).join("") : '<div class="history-empty">В этом направлении пока нет задач.</div>'}
+          <div class="section-head"><h2>История направления</h2></div>
+          ${recent.length ? recent.map(event => {
+            const date = new Date(event.timestamp).toLocaleString("ru-RU", {day:"numeric",month:"short",year:"numeric",hour:"2-digit",minute:"2-digit"});
+            return `<div class="history-entry">
+              <div class="history-entry-title">${event.type === "completed" ? "✓" : "↺"} ${escapeHTML(event.taskName || "Задача")}</div>
+              <div class="history-entry-meta">${event.type === "completed" ? "Выполнено" : "Возвращено в работу"} · ${date}</div>
+            </div>`;
+          }).join("") : '<div class="history-empty">История этого направления пока пуста.</div>'}
+        </section>`;
+      document.getElementById("directionStatsBack").onclick = () => { statsAreaId = null; renderDirectionStatistics(); };
+      return;
+    }
+  }
+
+  detail.classList.add("hidden");
+  list.classList.remove("hidden");
+  hint.classList.toggle("hidden", !data.areas.length);
+  if (!data.areas.length) {
+    list.innerHTML = '<div class="history-empty">Сначала создай направление — здесь появится его статистика.</div>';
+    return;
+  }
+  list.innerHTML = data.areas.map(area => {
+    const leaves = getLeafTasks(area.tasks);
+    const done = leaves.filter(item => item.task.done).length;
+    const total = leaves.length;
+    const percent = total ? Math.round(done/total*100) : 0;
+    const eventCount = (data.history || []).filter(event => event && event.areaId === area.id && event.type === "completed").length;
+    return `<button class="direction-stat-card" data-direction-stats="${escapeHTML(area.id)}">
+      <div class="direction-stat-top"><div class="direction-stat-name">${escapeHTML(area.name)}</div><div class="direction-stat-count">${percent}%</div></div>
+      <div class="track"><div class="fill" style="width:${percent}%"></div></div>
+      <div class="direction-stat-meta">${done} из ${total} задач сейчас выполнено · ${eventCount} выполнений за всё время</div>
+      <div class="direction-stat-open">Подробная статистика →</div>
+    </button>`;
+  }).join("");
+  list.querySelectorAll("[data-direction-stats]").forEach(button => {
+    button.onclick = () => { statsAreaId = button.dataset.directionStats; renderDirectionStatistics(); };
+  });
+}
+
 function renderStatistics() {
+  renderDirectionStatistics();
   const events = (data.history || []).filter(event =>
     event && (event.type === "completed" || event.type === "reopened")
       && !Number.isNaN(new Date(event.timestamp).getTime())
