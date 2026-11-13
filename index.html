@@ -986,26 +986,27 @@ function makeNode(node, list, parent = null, ancestors = []) {
 
   row.querySelector(".check").addEventListener("change", e => {
     const area = findArea(activeId);
-    const wasComplete = isNodeComplete(node);
     const willBeComplete = e.target.checked;
+    const previousStates = new Map();
+
+    const rememberLeafStates = task => {
+      if (task.children && task.children.length) {
+        task.children.forEach(rememberLeafStates);
+      } else {
+        previousStates.set(task, !!task.done);
+      }
+    };
+    rememberLeafStates(node);
 
     setNodeDone(node, willBeComplete);
 
-    // Историю пишем только для конечных задач, чтобы родительские
-    // галочки не дублировали выполненные подзадачи.
-    const recordLeafChanges = task => {
-      if (task.children && task.children.length) {
-        task.children.forEach(recordLeafChanges);
-      } else if (wasComplete !== willBeComplete) {
-        addHistoryEvent(willBeComplete ? "completed" : "reopened", area, task);
-      }
-    };
+    // Историю пишем только для конечных задач, не для родительских галочек.
     if (area) {
-      if (node.children && node.children.length) {
-        node.children.forEach(recordLeafChanges);
-      } else if (wasComplete !== willBeComplete) {
-        addHistoryEvent(willBeComplete ? "completed" : "reopened", area, node);
-      }
+      previousStates.forEach((wasComplete, task) => {
+        if (wasComplete !== !!task.done) {
+          addHistoryEvent(task.done ? "completed" : "reopened", area, task);
+        }
+      });
       syncTree(area.tasks);
     }
 
