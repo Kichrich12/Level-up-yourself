@@ -513,6 +513,27 @@ function findArea(id) {
   return data.areas.find(a => a.id === id);
 }
 
+// Проверяет, выполнена ли задача целиком, включая все уровни подзадач.
+function isNodeComplete(node) {
+  if (node.children && node.children.length) {
+    return node.children.every(isNodeComplete);
+  }
+  return !!node.done;
+}
+
+// Ставит или снимает отметку у задачи и у всех её потомков.
+function setNodeDone(node, checked) {
+  node.done = checked;
+  (node.children || []).forEach(child => setNodeDone(child, checked));
+}
+
+// Обновляет состояние родителя по состоянию всех его подзадач.
+function syncParentDone(parent) {
+  if (!parent) return;
+  parent.done = !!(parent.children && parent.children.length)
+    && parent.children.every(isNodeComplete);
+}
+
 function render() {
   const allTasks = data.areas.flatMap(a => a.tasks);
   const t = totals(allTasks);
@@ -646,21 +667,24 @@ function renderDetail(area) {
     `;
   } else {
     area.tasks.forEach(node => {
-      tree.appendChild(makeNode(node, area.tasks));
+      tree.appendChild(makeNode(node, area.tasks, null));
     });
   }
 }
 
-function makeNode(node, list) {
+function makeNode(node, list, parent = null) {
   const row = document.createElement("div");
 
-  row.className = "item" + (node.done ? " done" : "");
+  if (parent) node._parent = parent;
+  else delete node._parent;
+
+  row.className = "item" + (isNodeComplete(node) ? " done" : "");
 
   row.innerHTML = `
     <input
       class="check"
       type="checkbox"
-      ${node.done ? "checked" : ""}
+      ${(node.children && node.children.length ? node.children.every(isNodeComplete) : node.done) ? "checked" : ""}
       aria-label="Выполнено"
     >
 
@@ -697,7 +721,15 @@ function makeNode(node, list) {
   `;
 
   row.querySelector(".check").addEventListener("change", e => {
-    node.done = e.target.checked;
+    setNodeDone(node, e.target.checked);
+
+    // Поднимаемся вверх: родитель отмечается только когда выполнены все его дети.
+    let ancestor = parent;
+    while (ancestor) {
+      syncParentDone(ancestor);
+      ancestor = ancestor._parent || null;
+    }
+
     save();
   });
 
@@ -738,7 +770,7 @@ function makeNode(node, list) {
     children.className = "children";
 
     node.children.forEach(child => {
-      children.appendChild(makeNode(child, node.children));
+      children.appendChild(makeNode(child, node.children, node));
     });
 
     wrapper.appendChild(children);
