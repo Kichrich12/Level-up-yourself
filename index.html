@@ -534,6 +534,16 @@ function syncParentDone(parent) {
     && parent.children.every(isNodeComplete);
 }
 
+// Пересчитывает галочки снизу вверх для всего дерева задач.
+function syncTree(nodes) {
+  (nodes || []).forEach(node => {
+    if (node.children && node.children.length) {
+      syncTree(node.children);
+      node.done = node.children.every(child => child.done);
+    }
+  });
+}
+
 function render() {
   const allTasks = data.areas.flatMap(a => a.tasks);
   const t = totals(allTasks);
@@ -642,6 +652,7 @@ function openArea(id) {
 }
 
 function renderDetail(area) {
+  syncTree(area.tasks);
   const t = totals(area.tasks);
 
   const percent = t.total
@@ -675,13 +686,13 @@ function renderDetail(area) {
 function makeNode(node, list, parent = null, ancestors = []) {
   const row = document.createElement("div");
 
-  row.className = "item" + (isNodeComplete(node) ? " done" : "");
+  row.className = "item" + (node.done ? " done" : "");
 
   row.innerHTML = `
     <input
       class="check"
       type="checkbox"
-      ${(node.children && node.children.length ? node.children.every(isNodeComplete) : node.done) ? "checked" : ""}
+      ${node.done ? "checked" : ""}
       aria-label="Выполнено"
     >
 
@@ -721,10 +732,8 @@ function makeNode(node, list, parent = null, ancestors = []) {
     setNodeDone(node, e.target.checked);
 
     // Поднимаемся вверх: родитель отмечается только когда выполнены все его дети.
-    for (let i = ancestors.length - 1; i >= 0; i--) {
-      syncParentDone(ancestors[i]);
-    }
-    syncParentDone(parent);
+    const area = findArea(activeId);
+    if (area) syncTree(area.tasks);
 
     save();
   });
