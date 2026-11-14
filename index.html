@@ -939,10 +939,10 @@ const achievementCatalog = [
   {id:"subtask_100",category:"Подзадачи",name:"Системный подход",description:"Выполнить 100 подзадач",icon:"🧠",rarity:"gold"},
   {id:"subtask_order",category:"Подзадачи",name:"Абсолютный порядок",description:"Завершить все подзадачи одного направления",icon:"👑",rarity:"gold"},
 
-  {id:"secret_clean",category:"Секретные достижения",name:"Чистый лист",description:"Полностью завершить все задачи одного направления",icon:"🧹",rarity:"gold",secret:true},
+  {id:"secret_clean",category:"Секретные достижения",name:"Чистый лист",description:"Создать 3 направления",icon:"🧹",rarity:"gold",secret:true},
   {id:"secret_slow",category:"Секретные достижения",name:"Тише едешь — дальше будешь",description:"Выполнять хотя бы одну задачу 3 дня подряд",icon:"🐢",rarity:"bronze",secret:true},
   {id:"secret_aim",category:"Секретные достижения",name:"Меткий стрелок",description:"Выполнить 3 подзадачи из разных направлений",icon:"🎯",rarity:"silver",secret:true},
-  {id:"secret_puzzle",category:"Секретные достижения",name:"Разгадчик",description:"Полностью завершить одну задачу со всеми её подзадачами",icon:"🧩",rarity:"bronze",secret:true},
+  {id:"secret_puzzle",category:"Секретные достижения",name:"Разгадчик",description:"Полностью завершить 5 задач со всеми их подзадачами",icon:"🧩",rarity:"bronze",secret:true},
   {id:"secret_pioneer",category:"Секретные достижения",name:"Первопроходец",description:"Создать новое направление",icon:"🌟",rarity:"silver",secret:true},
   {id:"secret_no_retreat",category:"Секретные достижения",name:"Без отступления",description:"Выполнить 5 полных задач за 3 месяца",icon:"💪",rarity:"silver",secret:true}
 ];
@@ -988,6 +988,7 @@ function collectTaskStats() {
   let cleanDirection = false;
   let absoluteOrder = false;
   let puzzleComplete = false;
+  let fullyCompletedRootTasks = 0;
   let directionMax = 0;
 
   function walk(nodes, depth, areaId) {
@@ -1017,6 +1018,7 @@ function collectTaskStats() {
   });
 
   const completedRoots = rootTasks.filter(x => isNodeComplete(x.node)).length;
+  fullyCompletedRootTasks = completedRoots;
   const rootTotal = rootTasks.length;
   const doneSubtasks = subTasks.filter(n => !!n.done).length;
   const completedSubtaskEvents = completedEvents.filter(e => {
@@ -1034,7 +1036,7 @@ function collectTaskStats() {
     const t = totals(a.tasks);
     return t.total ? Math.round(t.done / t.total * 100) : 0;
   });
-  return {completedEvents,uniqueCompleted,days,streak,todayEvents,weekEvents,fullTaskEvents,todayFullTasks,weekFullTasks,monthFullTasks,threeMonthsFullTasks,activeAreaIds,completeDirections,cleanDirection,absoluteOrder,puzzleComplete,rootTasks,rootTotal,completedRoots,rootPercent,subTasks,doneSubtasks,subtaskIds,subtaskAreas,daySubtasks,taskCount,directionPercents,directionMax};
+  return {completedEvents,uniqueCompleted,days,streak,todayEvents,weekEvents,fullTaskEvents,todayFullTasks,weekFullTasks,monthFullTasks,threeMonthsFullTasks,activeAreaIds,completeDirections,cleanDirection,absoluteOrder,puzzleComplete,fullyCompletedRootTasks,rootTasks,rootTotal,completedRoots,rootPercent,subTasks,doneSubtasks,subtaskIds,subtaskAreas,daySubtasks,taskCount,directionPercents,directionMax};
 }
 
 function achievementCondition(id, st) {
@@ -1072,9 +1074,9 @@ function achievementCondition(id, st) {
     case "subtask_50": return sub(50);
     case "subtask_100": return sub(100);
     case "subtask_order": return st.absoluteOrder;
-    case "secret_clean": return st.cleanDirection;
+    case "secret_clean": return (data.meta.createdDirections || 0) >= 3;
     case "secret_aim": return st.subtaskAreas.size >= 3;
-    case "secret_puzzle": return st.puzzleComplete;
+    case "secret_puzzle": return st.fullyCompletedRootTasks >= 5;
     case "secret_pioneer": return (data.meta.createdDirections || 0) >= 1;
     case "secret_no_retreat": return new Set(st.threeMonthsFullTasks.map(e => (e.areaId||"")+":"+(e.taskId||""))).size >= 5;
     default: return false;
