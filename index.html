@@ -245,6 +245,12 @@ h2 {
   text-align: center;
 }
 
+.footer-spacer {
+  min-height: 40px;
+  visibility: hidden;
+  pointer-events: none;
+}
+
 .note {
   color: #8fa096;
   font-size: 11px;
@@ -570,13 +576,15 @@ input:focus { border-color: var(--gold); }
       ↺ Обнулить прогресс
     </button>
 
+    <button class="btn secondary small" id="importBtn">
+      Импорт копии
+    </button>
+
     <button class="btn secondary small" id="exportBtn">
       Экспорт копии
     </button>
 
-    <button class="btn secondary small" id="importBtn">
-      Импорт копии
-    </button>
+    <span class="footer-spacer" aria-hidden="true"></span>
 
     <input
       id="importFile"
