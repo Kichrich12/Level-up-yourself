@@ -958,7 +958,7 @@ function showNextAchievement() {
     data.achievementQueue.shift();
     localStorage.setItem(KEY,JSON.stringify(data));
     unlockBusy = false;
-    unlockTimer = setTimeout(showNextAchievement, 3000);
+    unlockTimer = setTimeout(showNextAchievement, 50);
   }, 3000);
 }
 
@@ -1640,7 +1640,7 @@ function resetTaskProgress(nodes) {
 document.getElementById("resetProgressBtn").onclick = () => {
   const confirmed = confirm(
     "Вы точно хотите обнулить весь прогресс?\n\n" +
-    "История достижений будет удалена, а все выполненные галочки сняты. " +
+    "История активности будет удалена, а все выполненные галочки сняты. " +
     "Направления, задачи и подзадачи останутся на месте."
   );
 
