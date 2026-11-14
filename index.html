@@ -370,6 +370,97 @@ h2 {
   line-height: 1.6;
 }
 
+.discipline-calendar-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin: 22px 0 14px;
+}
+.discipline-calendar-head h3 {
+  margin: 0;
+  color: var(--gold-light);
+  font-family: Georgia, serif;
+  font-size: 18px;
+  text-transform: capitalize;
+  text-align: center;
+}
+.discipline-weekdays, .discipline-days {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  gap: 6px;
+}
+.discipline-weekdays {
+  margin-bottom: 7px;
+  color: var(--muted);
+  text-align: center;
+  font-size: 11px;
+}
+.discipline-days button, .discipline-days span {
+  min-width: 0;
+  aspect-ratio: 1;
+  border-radius: 10px;
+}
+.discipline-days button {
+  border: 1px solid #ffffff12;
+  background: #071b17;
+  color: var(--text);
+  font-size: 13px;
+  position: relative;
+  padding: 0;
+}
+.discipline-days button.active {
+  background: linear-gradient(145deg, #80652f, #4e4428);
+  border-color: var(--gold-light);
+  color: #fff5d8;
+  font-weight: 700;
+}
+.discipline-days button.today {
+  outline: 1px solid var(--gold-light);
+  outline-offset: 2px;
+}
+.discipline-days button.selected {
+  box-shadow: 0 0 0 2px var(--gold-light);
+}
+.discipline-days button:disabled {
+  opacity: .28;
+  cursor: default;
+}
+.discipline-legend {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 16px;
+  margin: 14px 0 20px;
+  color: var(--muted);
+  font-size: 11px;
+}
+.discipline-legend span {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+.discipline-dot {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  display: inline-block;
+  background: #243b34;
+  border: 1px solid #587065;
+}
+.discipline-dot.active {
+  background: var(--gold);
+  border-color: var(--gold-light);
+}
+.discipline-day-entry {
+  text-align: left;
+  padding: 10px 0;
+  border-bottom: 1px solid #ffffff12;
+}
+.discipline-day-entry:last-child { border-bottom: 0; }
+.discipline-day-entry strong { display: block; font-size: 13px; }
+.discipline-day-entry small { color: var(--muted); font-size: 11px; }
+
 @media(max-width:380px) {
   .history-grid { grid-template-columns: repeat(2, 1fr); }
 }
@@ -576,6 +667,10 @@ input:focus { border-color: var(--gold); }
       ↺ Обнулить прогресс
     </button>
 
+    <button class="btn secondary small" id="disciplineBtn">
+      ◷ Календарь дисциплины
+    </button>
+
     <button class="btn secondary small" id="importBtn">
       Импорт копии
     </button>
@@ -583,8 +678,6 @@ input:focus { border-color: var(--gold); }
     <button class="btn secondary small" id="exportBtn">
       Экспорт копии
     </button>
-
-    <span class="footer-spacer" aria-hidden="true"></span>
 
     <input
       id="importFile"
@@ -714,6 +807,48 @@ input:focus { border-color: var(--gold); }
     <div class="achievement-summary" id="achievementSummary" style="margin-top:9px">История твоих побед</div>
     <div id="achievementList"></div>
     <div id="platinumStatus"></div>
+  </section>
+</section>
+
+<section id="disciplineCalendar" class="hidden">
+  <button class="back" id="backFromDiscipline">← На главную</button>
+  <div class="crumb">LEVEL UP YOURSELF / КАЛЕНДАРЬ ДИСЦИПЛИНЫ</div>
+  <section class="panel">
+    <div class="section-head" style="margin-top:0">
+      <h2>Моя дисциплина</h2>
+      <div class="achievement-count" id="disciplineMonthActive">0 дней</div>
+    </div>
+    <div class="history-grid discipline-stats">
+      <div class="history-stat">
+        <div class="history-number" id="disciplineCurrentStreak">0</div>
+        <div class="history-label">Текущая серия</div>
+      </div>
+      <div class="history-stat">
+        <div class="history-number" id="disciplineBestStreak">0</div>
+        <div class="history-label">Лучшая серия</div>
+      </div>
+      <div class="history-stat">
+        <div class="history-number" id="disciplineTotalDays">0</div>
+        <div class="history-label">Активных дней</div>
+      </div>
+    </div>
+    <div class="discipline-calendar-head">
+      <button class="iconbtn" id="disciplinePrevMonth" aria-label="Предыдущий месяц">←</button>
+      <h3 id="disciplineMonthLabel"></h3>
+      <button class="iconbtn" id="disciplineNextMonth" aria-label="Следующий месяц">→</button>
+    </div>
+    <div class="discipline-weekdays">
+      <span>Пн</span><span>Вт</span><span>Ср</span><span>Чт</span><span>Пт</span><span>Сб</span><span>Вс</span>
+    </div>
+    <div class="discipline-days" id="disciplineDays"></div>
+    <div class="discipline-legend">
+      <span><i class="discipline-dot active"></i> Был прогресс</span>
+      <span><i class="discipline-dot"></i> Без активности</span>
+    </div>
+    <div class="section-head">
+      <h2 id="disciplineSelectedTitle">Активность за день</h2>
+    </div>
+    <div id="disciplineDayDetails" class="history-empty">Выбери день в календаре.</div>
   </section>
 </section>
 
@@ -1052,6 +1187,123 @@ function dateKey(date) {
     String(date.getMonth() + 1).padStart(2, "0") + "-" +
     String(date.getDate()).padStart(2, "0");
 }
+
+let disciplineMonth = new Date(new Date().getFullYear(), new Date().getMonth(), 1);
+let disciplineSelectedDate = dateKey(new Date());
+
+function getDisciplineActivity() {
+  const completed = (data.history || []).filter(event =>
+    event && event.type === "completed" &&
+    !Number.isNaN(new Date(event.timestamp).getTime())
+  );
+  const byDay = new Map();
+  completed.forEach(event => {
+    const key = dateKey(new Date(event.timestamp));
+    if (!byDay.has(key)) byDay.set(key, []);
+    byDay.get(key).push(event);
+  });
+  const activeKeys = [...byDay.keys()].sort();
+  let best = 0, run = 0, previous = null;
+  activeKeys.forEach(key => {
+    const day = new Date(key + "T12:00:00");
+    if (previous && Math.round((day - previous) / 86400000) === 1) run++;
+    else run = 1;
+    best = Math.max(best, run);
+    previous = day;
+  });
+  const today = new Date();
+  const todayKey = dateKey(today);
+  const yesterday = new Date(today);
+  yesterday.setDate(yesterday.getDate() - 1);
+  const yesterdayKey = dateKey(yesterday);
+  let current = 0;
+  let cursor = activeKeys.includes(todayKey) ? new Date(todayKey + "T12:00:00")
+    : activeKeys.includes(yesterdayKey) ? new Date(yesterdayKey + "T12:00:00") : null;
+  while (cursor && byDay.has(dateKey(cursor))) {
+    current++;
+    cursor.setDate(cursor.getDate() - 1);
+  }
+  return { byDay, activeKeys, best, current };
+}
+
+function renderDisciplineCalendar() {
+  const activity = getDisciplineActivity();
+  const monthStart = new Date(disciplineMonth.getFullYear(), disciplineMonth.getMonth(), 1);
+  const monthEnd = new Date(disciplineMonth.getFullYear(), disciplineMonth.getMonth() + 1, 0);
+  const monthName = monthStart.toLocaleDateString("ru-RU", { month: "long", year: "numeric" });
+  document.getElementById("disciplineMonthLabel").textContent = monthName;
+  document.getElementById("disciplineCurrentStreak").textContent = activity.current;
+  document.getElementById("disciplineBestStreak").textContent = activity.best;
+  document.getElementById("disciplineTotalDays").textContent = activity.activeKeys.length;
+  let activeThisMonth = 0;
+  for (let d = 1; d <= monthEnd.getDate(); d++) {
+    const key = dateKey(new Date(monthStart.getFullYear(), monthStart.getMonth(), d));
+    if (activity.byDay.has(key)) activeThisMonth++;
+  }
+  document.getElementById("disciplineMonthActive").textContent = activeThisMonth + " дн.";
+  const offset = (monthStart.getDay() + 6) % 7;
+  const cells = [];
+  for (let i = 0; i < offset; i++) cells.push("<span></span>");
+  const todayKey = dateKey(new Date());
+  for (let d = 1; d <= monthEnd.getDate(); d++) {
+    const date = new Date(monthStart.getFullYear(), monthStart.getMonth(), d);
+    const key = dateKey(date);
+    const isActive = activity.byDay.has(key);
+    const isFuture = date > new Date(new Date().getFullYear(), new Date().getMonth(), new Date().getDate());
+    const classes = [isActive ? "active" : "", key === todayKey ? "today" : "", key === disciplineSelectedDate ? "selected" : ""].filter(Boolean).join(" ");
+    cells.push('<button type="button" class="' + classes + '" data-discipline-date="' + key + '"' + (isFuture ? " disabled" : "") + ' aria-label="' + d + (isActive ? ", была активность" : "") + '">' + d + '</button>');
+  }
+  document.getElementById("disciplineDays").innerHTML = cells.join("");
+  document.querySelectorAll("[data-discipline-date]").forEach(button => {
+    button.onclick = () => {
+      disciplineSelectedDate = button.dataset.disciplineDate;
+      renderDisciplineCalendar();
+    };
+  });
+  const selected = disciplineSelectedDate;
+  const selectedDate = selected ? new Date(selected + "T12:00:00") : null;
+  document.getElementById("disciplineSelectedTitle").textContent = selectedDate
+    ? selectedDate.toLocaleDateString("ru-RU", { day: "numeric", month: "long", year: "numeric" })
+    : "Активность за день";
+  const dayEvents = selected ? (activity.byDay.get(selected) || []) : [];
+  const details = document.getElementById("disciplineDayDetails");
+  if (!selected) {
+    details.textContent = "Выбери день в календаре.";
+  } else if (!dayEvents.length) {
+    details.textContent = "В этот день выполненных задач не зафиксировано.";
+  } else {
+    details.innerHTML = dayEvents.map(event => {
+      const time = new Date(event.timestamp).toLocaleTimeString("ru-RU", { hour: "2-digit", minute: "2-digit" });
+      return '<div class="discipline-day-entry"><strong>✓ ' + escapeHTML(event.taskName || "Задача") + '</strong><small>' + escapeHTML(event.areaName || "Направление") + ' · ' + time + '</small></div>';
+    }).join("");
+  }
+}
+
+function showDisciplineCalendar() {
+  ["home", "detail", "statistics", "achievements"].forEach(id => document.getElementById(id).classList.add("hidden"));
+  document.getElementById("disciplineCalendar").classList.remove("hidden");
+  renderDisciplineCalendar();
+}
+function backFromDiscipline() {
+  document.getElementById("disciplineCalendar").classList.add("hidden");
+  document.getElementById("home").classList.remove("hidden");
+}
+document.getElementById("disciplineBtn").onclick = showDisciplineCalendar;
+document.getElementById("backFromDiscipline").onclick = backFromDiscipline;
+document.getElementById("disciplinePrevMonth").onclick = () => {
+  disciplineMonth = new Date(disciplineMonth.getFullYear(), disciplineMonth.getMonth() - 1, 1);
+  disciplineSelectedDate = null;
+  renderDisciplineCalendar();
+};
+document.getElementById("disciplineNextMonth").onclick = () => {
+  const next = new Date(disciplineMonth.getFullYear(), disciplineMonth.getMonth() + 1, 1);
+  const now = new Date();
+  if (next <= new Date(now.getFullYear(), now.getMonth(), 1)) {
+    disciplineMonth = next;
+    disciplineSelectedDate = null;
+    renderDisciplineCalendar();
+  }
+};
 
 let statsAreaId = null;
 
