@@ -497,6 +497,10 @@ input:focus { border-color: var(--gold); }
       ◷ Статистика
     </button>
 
+    <button class="btn secondary small" id="resetProgressBtn">
+      ↺ Обнулить прогресс
+    </button>
+
     <button class="btn secondary small" id="exportBtn">
       Экспорт копии
     </button>
@@ -1262,6 +1266,30 @@ function backFromStatistics() {
 
 document.getElementById("statsBtn").onclick = showStatistics;
 document.getElementById("backFromStats").onclick = backFromStatistics;
+
+// Сбрасывает только прогресс: направления и задачи остаются на месте.
+function resetTaskProgress(nodes) {
+  (nodes || []).forEach(task => {
+    task.done = false;
+    resetTaskProgress(task.children);
+  });
+}
+
+document.getElementById("resetProgressBtn").onclick = () => {
+  const confirmed = confirm(
+    "Вы точно хотите обнулить весь прогресс?\n\n" +
+    "История достижений будет удалена, а все выполненные галочки сняты. " +
+    "Направления, задачи и подзадачи останутся на месте."
+  );
+
+  if (!confirmed) return;
+
+  data.areas.forEach(area => resetTaskProgress(area.tasks));
+  data.history = [];
+  statsAreaId = null;
+  save();
+  alert("Прогресс обнулён. Можно начинать новый этап!");
+};
 
 function addRootTask() {
   const input = document.getElementById("newTask");
