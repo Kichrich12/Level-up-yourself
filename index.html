@@ -944,7 +944,7 @@ const achievementCatalog = [
   {id:"secret_aim",category:"Секретные достижения",name:"Меткий стрелок",description:"Выполнить 3 подзадачи из разных направлений",icon:"🎯",rarity:"silver",secret:true},
   {id:"secret_puzzle",category:"Секретные достижения",name:"Разгадчик",description:"Полностью завершить одну задачу со всеми её подзадачами",icon:"🧩",rarity:"bronze",secret:true},
   {id:"secret_pioneer",category:"Секретные достижения",name:"Первопроходец",description:"Создать новое направление",icon:"🌟",rarity:"silver",secret:true},
-  {id:"secret_no_retreat",category:"Секретные достижения",name:"Без отступления",description:"Выполнить 5 полных задач за 1 день",icon:"💪",rarity:"silver",secret:true}
+  {id:"secret_no_retreat",category:"Секретные достижения",name:"Без отступления",description:"Выполнить 5 полных задач за 3 месяца",icon:"💪",rarity:"silver",secret:true}
 ];
 const platinumAchievement = {id:"platinum",name:"LEVEL-UP-YOURSELF",description:"Получить все 36 обычных и секретных достижений",icon:"♛",rarity:"platinum"};
 
@@ -980,6 +980,8 @@ function collectTaskStats() {
   const weekFullTasks = fullTaskEvents.filter(e => new Date(e.timestamp) >= weekStart);
   const monthStart = new Date(); monthStart.setHours(0,0,0,0); monthStart.setDate(monthStart.getDate()-29);
   const monthFullTasks = fullTaskEvents.filter(e => new Date(e.timestamp) >= monthStart);
+  const threeMonthsStart = new Date(); threeMonthsStart.setHours(0,0,0,0); threeMonthsStart.setMonth(threeMonthsStart.getMonth()-3);
+  const threeMonthsFullTasks = fullTaskEvents.filter(e => new Date(e.timestamp) >= threeMonthsStart);
   const activeAreaIds = new Set(completedEvents.map(e => e.areaId).filter(Boolean));
   let completeDirections = 0;
   let cleanDirection = false;
@@ -1031,7 +1033,7 @@ function collectTaskStats() {
     const t = totals(a.tasks);
     return t.total ? Math.round(t.done / t.total * 100) : 0;
   });
-  return {completedEvents,uniqueCompleted,days,streak,todayEvents,weekEvents,fullTaskEvents,todayFullTasks,weekFullTasks,monthFullTasks,activeAreaIds,completeDirections,cleanDirection,absoluteOrder,puzzleComplete,rootTasks,rootTotal,completedRoots,rootPercent,subTasks,doneSubtasks,subtaskIds,subtaskAreas,daySubtasks,taskCount,directionPercents,directionMax};
+  return {completedEvents,uniqueCompleted,days,streak,todayEvents,weekEvents,fullTaskEvents,todayFullTasks,weekFullTasks,monthFullTasks,threeMonthsFullTasks,activeAreaIds,completeDirections,cleanDirection,absoluteOrder,puzzleComplete,rootTasks,rootTotal,completedRoots,rootPercent,subTasks,doneSubtasks,subtaskIds,subtaskAreas,daySubtasks,taskCount,directionPercents,directionMax};
 }
 
 function achievementCondition(id, st) {
@@ -1073,7 +1075,7 @@ function achievementCondition(id, st) {
     case "secret_aim": return st.subtaskAreas.size >= 3;
     case "secret_puzzle": return st.puzzleComplete;
     case "secret_pioneer": return (data.meta.createdDirections || 0) >= 1;
-    case "secret_no_retreat": return new Set(st.todayFullTasks.map(e => (e.areaId||"")+":"+(e.taskId||""))).size >= 5;
+    case "secret_no_retreat": return new Set(st.threeMonthsFullTasks.map(e => (e.areaId||"")+":"+(e.taskId||""))).size >= 5;
     default: return false;
   }
 }
