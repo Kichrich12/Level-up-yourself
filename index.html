@@ -939,7 +939,7 @@ const achievementCatalog = [
   {id:"subtask_100",category:"Подзадачи",name:"Системный подход",description:"Выполнить 100 подзадач",icon:"🧠",rarity:"gold"},
   {id:"subtask_order",category:"Подзадачи",name:"Абсолютный порядок",description:"Завершить все подзадачи одного направления",icon:"👑",rarity:"gold"},
 
-  {id:"secret_clean",category:"Секретные достижения",name:"Чистый лист",description:"Создать 3 направления",icon:"🧹",rarity:"gold",secret:true},
+  {id:"secret_clean",category:"Секретные достижения",name:"Чистый лист",description:"Полностью завершить 3 направления",icon:"🧹",rarity:"gold",secret:true},
   {id:"secret_slow",category:"Секретные достижения",name:"Тише едешь — дальше будешь",description:"Выполнять хотя бы одну задачу 3 дня подряд",icon:"🐢",rarity:"bronze",secret:true},
   {id:"secret_aim",category:"Секретные достижения",name:"Меткий стрелок",description:"Выполнить 3 подзадачи из разных направлений",icon:"🎯",rarity:"silver",secret:true},
   {id:"secret_puzzle",category:"Секретные достижения",name:"Разгадчик",description:"Полностью завершить 5 задач со всеми их подзадачами",icon:"🧩",rarity:"bronze",secret:true},
@@ -1074,7 +1074,7 @@ function achievementCondition(id, st) {
     case "subtask_50": return sub(50);
     case "subtask_100": return sub(100);
     case "subtask_order": return st.absoluteOrder;
-    case "secret_clean": return (data.meta.createdDirections || 0) >= 3;
+    case "secret_clean": return st.completeDirections >= 3;
     case "secret_aim": return st.subtaskAreas.size >= 3;
     case "secret_puzzle": return st.fullyCompletedRootTasks >= 5;
     case "secret_pioneer": return (data.meta.createdDirections || 0) >= 1;
