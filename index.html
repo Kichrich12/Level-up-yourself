@@ -904,12 +904,12 @@ function load() {
 
 
 const achievementCatalog = [
-  {id:"first_start",category:"Первые шаги",name:"Начало пути",description:"Выполнить первую задачу",icon:"🌱",rarity:"bronze"},
-  {id:"first_five",category:"Первые шаги",name:"Первый шаг",description:"Выполнить 5 задач",icon:"🚶",rarity:"bronze"},
-  {id:"first_ten",category:"Первые шаги",name:"В движении",description:"Выполнить 10 задач",icon:"🧭",rarity:"bronze"},
-  {id:"first_25",category:"Первые шаги",name:"Разгон",description:"Выполнить 25 задач",icon:"⚡",rarity:"silver"},
-  {id:"first_50",category:"Первые шаги",name:"Втянулся",description:"Выполнить 50 задач",icon:"🔥",rarity:"silver"},
-  {id:"first_100",category:"Первые шаги",name:"Сотня успехов",description:"Выполнить 100 задач",icon:"💯",rarity:"gold"},
+  {id:"first_start",category:"Первые шаги",name:"Первое направление",description:"Создать своё первое направление",icon:"🌱",rarity:"bronze"},
+  {id:"first_five",category:"Первые шаги",name:"Первая задача",description:"Добавить первую основную задачу",icon:"📝",rarity:"bronze"},
+  {id:"first_ten",category:"Первые шаги",name:"Первая победа",description:"Завершить первую основную задачу",icon:"✅",rarity:"bronze"},
+  {id:"first_25",category:"Первые шаги",name:"Второе направление",description:"Создать второе направление",icon:"🧭",rarity:"bronze"},
+  {id:"first_50",category:"Первые шаги",name:"Ещё одна задача",description:"Добавить вторую основную задачу",icon:"📋",rarity:"bronze"},
+  {id:"first_100",category:"Первые шаги",name:"Две победы",description:"Завершить две основные задачи",icon:"🏅",rarity:"bronze"},
 
   {id:"discipline_1",category:"Железная дисциплина",name:"Первый день",description:"Заниматься один день",icon:"📅",rarity:"bronze"},
   {id:"discipline_3",category:"Железная дисциплина",name:"Три дня подряд",description:"Заниматься 3 дня подряд",icon:"🔥",rarity:"bronze"},
@@ -1044,12 +1044,12 @@ function achievementCondition(id, st) {
   const sub = n => st.subtaskIds.size >= n;
   const hasDirection = n => st.activeAreaIds.size >= n;
   switch(id) {
-    case "first_start": return has(1);
-    case "first_five": return has(5);
-    case "first_ten": return has(10);
-    case "first_25": return has(25);
-    case "first_50": return has(50);
-    case "first_100": return has(100);
+    case "first_start": return (data.meta.createdDirections || 0) >= 1;
+    case "first_five": return st.rootTotal >= 1;
+    case "first_ten": return st.fullyCompletedRootTasks >= 1;
+    case "first_25": return (data.meta.createdDirections || 0) >= 2;
+    case "first_50": return st.rootTotal >= 2;
+    case "first_100": return st.fullyCompletedRootTasks >= 2;
     case "discipline_1": return st.days.size >= 1;
     case "discipline_3": case "secret_slow": return st.streak >= 3;
     case "discipline_7": return st.streak >= 7;
