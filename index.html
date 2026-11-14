@@ -928,8 +928,8 @@ const achievementCatalog = [
   {id:"all_50",category:"Великие свершения",name:"Полпути",description:"Выполнить 50% всех основных задач",icon:"🏅",rarity:"bronze"},
   {id:"all_75",category:"Великие свершения",name:"Почти у цели",description:"Выполнить 75% всех основных задач",icon:"🏆",rarity:"silver"},
   {id:"all_100",category:"Великие свершения",name:"Совершенство",description:"Выполнить 100% всех основных задач",icon:"💎",rarity:"gold"},
-  {id:"daily_3",category:"Великие свершения",name:"Первый рывок",description:"Выполнить 3 задачи за один день",icon:"🚀",rarity:"bronze"},
-  {id:"weekly_5",category:"Великие свершения",name:"Хороший темп",description:"Выполнить 5 задач за неделю",icon:"⚔️",rarity:"silver"},
+  {id:"daily_3",category:"Великие свершения",name:"Первый рывок",description:"Выполнить 1 полную задачу за 1 неделю",icon:"🚀",rarity:"bronze"},
+  {id:"weekly_5",category:"Великие свершения",name:"Хороший темп",description:"Выполнить 3 полные задачи за 1 месяц",icon:"⚔️",rarity:"silver"},
   {id:"three_peaks",category:"Великие свершения",name:"Покоритель вершин",description:"Полностью завершить 3 направления",icon:"🏰",rarity:"gold"},
 
   {id:"subtask_1",category:"Подзадачи",name:"Детализация",description:"Выполнить первую подзадачу",icon:"🧩",rarity:"bronze"},
@@ -944,7 +944,7 @@ const achievementCatalog = [
   {id:"secret_aim",category:"Секретные достижения",name:"Меткий стрелок",description:"Выполнить 3 подзадачи из разных направлений",icon:"🎯",rarity:"silver",secret:true},
   {id:"secret_puzzle",category:"Секретные достижения",name:"Разгадчик",description:"Полностью завершить одну задачу со всеми её подзадачами",icon:"🧩",rarity:"bronze",secret:true},
   {id:"secret_pioneer",category:"Секретные достижения",name:"Первопроходец",description:"Создать новое направление",icon:"🌟",rarity:"silver",secret:true},
-  {id:"secret_no_retreat",category:"Секретные достижения",name:"Без отступления",description:"Выполнить 3 подзадачи за один день",icon:"💪",rarity:"silver",secret:true}
+  {id:"secret_no_retreat",category:"Секретные достижения",name:"Без отступления",description:"Выполнить 5 полных задач за 1 день",icon:"💪",rarity:"silver",secret:true}
 ];
 const platinumAchievement = {id:"platinum",name:"LEVEL-UP-YOURSELF",description:"Получить все 36 обычных и секретных достижений",icon:"♛",rarity:"platinum"};
 
@@ -974,8 +974,12 @@ function collectTaskStats() {
   });
   const today = dateKey(new Date());
   const todayEvents = completedEvents.filter(e => dateKey(new Date(e.timestamp)) === today);
+  const fullTaskEvents = (data.history || []).filter(e => e && e.type === "root_completed" && !Number.isNaN(new Date(e.timestamp).getTime()));
+  const todayFullTasks = fullTaskEvents.filter(e => dateKey(new Date(e.timestamp)) === today);
   const weekStart = new Date(); weekStart.setHours(0,0,0,0); weekStart.setDate(weekStart.getDate()-6);
-  const weekEvents = completedEvents.filter(e => new Date(e.timestamp) >= weekStart);
+  const weekFullTasks = fullTaskEvents.filter(e => new Date(e.timestamp) >= weekStart);
+  const monthStart = new Date(); monthStart.setHours(0,0,0,0); monthStart.setDate(monthStart.getDate()-29);
+  const monthFullTasks = fullTaskEvents.filter(e => new Date(e.timestamp) >= monthStart);
   const activeAreaIds = new Set(completedEvents.map(e => e.areaId).filter(Boolean));
   let completeDirections = 0;
   let cleanDirection = false;
@@ -1027,7 +1031,7 @@ function collectTaskStats() {
     const t = totals(a.tasks);
     return t.total ? Math.round(t.done / t.total * 100) : 0;
   });
-  return {completedEvents,uniqueCompleted,days,streak,todayEvents,weekEvents,activeAreaIds,completeDirections,cleanDirection,absoluteOrder,puzzleComplete,rootTasks,rootTotal,completedRoots,rootPercent,subTasks,doneSubtasks,subtaskIds,subtaskAreas,daySubtasks,taskCount,directionPercents,directionMax};
+  return {completedEvents,uniqueCompleted,days,streak,todayEvents,weekEvents,fullTaskEvents,todayFullTasks,weekFullTasks,monthFullTasks,activeAreaIds,completeDirections,cleanDirection,absoluteOrder,puzzleComplete,rootTasks,rootTotal,completedRoots,rootPercent,subTasks,doneSubtasks,subtaskIds,subtaskAreas,daySubtasks,taskCount,directionPercents,directionMax};
 }
 
 function achievementCondition(id, st) {
@@ -1056,8 +1060,8 @@ function achievementCondition(id, st) {
     case "all_50": return st.rootTotal > 0 && st.rootPercent >= 50;
     case "all_75": return st.rootTotal > 0 && st.rootPercent >= 75;
     case "all_100": return st.rootTotal > 0 && st.rootPercent === 100;
-    case "daily_3": return new Set(st.todayEvents.map(e => (e.areaId||"")+":"+(e.taskId||""))).size >= 3;
-    case "weekly_5": return new Set(st.weekEvents.map(e => (e.areaId||"")+":"+(e.taskId||""))).size >= 5;
+    case "daily_3": return new Set(st.weekFullTasks.map(e => (e.areaId||"")+":"+(e.taskId||""))).size >= 1;
+    case "weekly_5": return new Set(st.monthFullTasks.map(e => (e.areaId||"")+":"+(e.taskId||""))).size >= 3;
     case "three_peaks": return st.completeDirections >= 3;
     case "subtask_1": return sub(1);
     case "subtask_10": return sub(10);
@@ -1069,7 +1073,7 @@ function achievementCondition(id, st) {
     case "secret_aim": return st.subtaskAreas.size >= 3;
     case "secret_puzzle": return st.puzzleComplete;
     case "secret_pioneer": return (data.meta.createdDirections || 0) >= 1;
-    case "secret_no_retreat": return st.daySubtasks.size >= 3;
+    case "secret_no_retreat": return new Set(st.todayFullTasks.map(e => (e.areaId||"")+":"+(e.taskId||""))).size >= 5;
     default: return false;
   }
 }
@@ -1755,6 +1759,8 @@ function makeNode(node, list, parent = null, ancestors = []) {
   row.querySelector(".check").addEventListener("change", e => {
     const area = findArea(activeId);
     const willBeComplete = e.target.checked;
+    const rootTask = ancestors.length ? ancestors[0] : (parent || node);
+    const wasRootComplete = isNodeComplete(rootTask);
     const previousStates = new Map();
 
     const rememberLeafStates = task => {
@@ -1776,6 +1782,10 @@ function makeNode(node, list, parent = null, ancestors = []) {
         }
       });
       syncTree(area.tasks);
+      // Отдельно фиксируем завершение именно целой основной задачи, а не подзадачи.
+      if (!wasRootComplete && isNodeComplete(rootTask)) {
+        addHistoryEvent("root_completed", area, rootTask);
+      }
     }
 
     save();
@@ -2094,7 +2104,7 @@ document.getElementById("importFile").onchange = async e => {
           }
           return {
             id: typeof event.id === "string" ? event.id : uid(),
-            type: event.type === "reopened" ? "reopened" : "completed",
+            type: event.type === "reopened" ? "reopened" : (event.type === "root_completed" ? "root_completed" : "completed"),
             areaId: typeof event.areaId === "string" ? event.areaId : "",
             areaName: String(event.areaName || ""),
             taskId: typeof event.taskId === "string" ? event.taskId : "",
