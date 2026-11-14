@@ -1044,10 +1044,10 @@ function achievementCondition(id, st) {
   const sub = n => st.subtaskIds.size >= n;
   const hasDirection = n => st.activeAreaIds.size >= n;
   switch(id) {
-    case "first_start": return (data.meta.createdDirections || 0) >= 1;
+    case "first_start": return data.areas.length >= 1;
     case "first_five": return st.rootTotal >= 1;
     case "first_ten": return st.fullyCompletedRootTasks >= 1;
-    case "first_25": return (data.meta.createdDirections || 0) >= 2;
+    case "first_25": return data.areas.length >= 2;
     case "first_50": return st.rootTotal >= 2;
     case "first_100": return st.fullyCompletedRootTasks >= 2;
     case "discipline_1": return st.days.size >= 1;
