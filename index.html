@@ -2167,6 +2167,41 @@ localStorage.setItem(KEY, JSON.stringify(data));
 render();
 renderAchievements();
 if (data.achievementQueue.length) setTimeout(showNextAchievement, 700);
+
+<script>
+// Автоматическое обновление установленной веб-версии.
+if ("serviceWorker" in navigator) {
+  let hadController = !!navigator.serviceWorker.controller;
+  let refreshingAfterUpdate = false;
+
+  navigator.serviceWorker.addEventListener("controllerchange", () => {
+    if (hadController && !refreshingAfterUpdate) {
+      refreshingAfterUpdate = true;
+      window.location.reload();
+    }
+    hadController = true;
+  });
+
+  window.addEventListener("load", () => {
+    navigator.serviceWorker.register("./sw.js", {
+      scope: "./",
+      updateViaCache: "none"
+    }).then(registration => {
+      registration.update().catch(() => {});
+      document.addEventListener("visibilitychange", () => {
+        if (document.visibilityState === "visible") {
+          registration.update().catch(() => {});
+        }
+      });
+      window.addEventListener("pageshow", () => {
+        registration.update().catch(() => {});
+      });
+    }).catch(error => {
+      console.warn("Не удалось проверить обновление приложения:", error);
+    });
+  });
+}
+</script>
 </script>
 </body>
 </html>
