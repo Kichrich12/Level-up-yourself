@@ -369,6 +369,7 @@ h2 {
 }
 
 .hidden { display: none !important; }
+#achievements:not(.hidden) { display:block !important; visibility:visible !important; }
 
 .back {
   color: var(--gold-light);
@@ -728,7 +729,10 @@ function load() {
     const stored = JSON.parse(localStorage.getItem(KEY)) || {};
     return {
       areas: Array.isArray(stored.areas) ? stored.areas : [],
-      history: Array.isArray(stored.history) ? stored.history : []
+      history: Array.isArray(stored.history) ? stored.history : [],
+      achievements: stored.achievements && typeof stored.achievements === "object" ? stored.achievements : {},
+      achievementQueue: Array.isArray(stored.achievementQueue) ? stored.achievementQueue : [],
+      meta: stored.meta && typeof stored.meta === "object" ? stored.meta : { createdDirections: 0 }
     };
   } catch {
     return { areas: [], history: [] };
@@ -1615,11 +1619,24 @@ document.getElementById("statsBtn").onclick = showStatistics;
 document.getElementById("backFromStats").onclick = backFromStatistics;
 
 function showAchievements() {
-  document.getElementById("home").classList.add("hidden");
-  document.getElementById("detail").classList.add("hidden");
-  document.getElementById("statistics").classList.add("hidden");
-  document.getElementById("achievements").classList.remove("hidden");
-  renderAchievements();
+  const home = document.getElementById("home");
+  const detail = document.getElementById("detail");
+  const statistics = document.getElementById("statistics");
+  const section = document.getElementById("achievements");
+  home.classList.add("hidden");
+  detail.classList.add("hidden");
+  statistics.classList.add("hidden");
+  section.classList.remove("hidden");
+  section.style.display = "block";
+  section.style.visibility = "visible";
+  section.style.minHeight = "60vh";
+  try {
+    renderAchievements();
+  } catch (error) {
+    const list = document.getElementById("achievementList");
+    if (list) list.innerHTML = '<div class="empty">Не удалось отобразить достижения. Обнови страницу и попробуй ещё раз.</div>';
+    console.error("Achievements render error:", error);
+  }
 }
 function backFromAchievements() {
   document.getElementById("achievements").classList.add("hidden");
