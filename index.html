@@ -977,6 +977,7 @@ function collectTaskStats() {
   const fullTaskEvents = (data.history || []).filter(e => e && e.type === "root_completed" && !Number.isNaN(new Date(e.timestamp).getTime()));
   const todayFullTasks = fullTaskEvents.filter(e => dateKey(new Date(e.timestamp)) === today);
   const weekStart = new Date(); weekStart.setHours(0,0,0,0); weekStart.setDate(weekStart.getDate()-6);
+  const weekEvents = completedEvents.filter(e => new Date(e.timestamp) >= weekStart);
   const weekFullTasks = fullTaskEvents.filter(e => new Date(e.timestamp) >= weekStart);
   const monthStart = new Date(); monthStart.setHours(0,0,0,0); monthStart.setDate(monthStart.getDate()-29);
   const monthFullTasks = fullTaskEvents.filter(e => new Date(e.timestamp) >= monthStart);
