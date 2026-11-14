@@ -1,10 +1,11 @@
-const CACHE_NAME = "level-up-yourself-shell-v1";
+const CACHE_NAME = "level-up-yourself-shell-v2";
 const APP_PREFIX = "level-up-yourself-shell-";
 
 self.addEventListener("install", event => {
   event.waitUntil((async () => {
     const cache = await caches.open(CACHE_NAME);
-    await cache.add("./");
+    const freshShell = await fetch("./", { cache: "reload" });
+    if (freshShell.ok) await cache.put("./", freshShell);
     await self.skipWaiting();
   })());
 });
