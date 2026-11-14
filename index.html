@@ -1839,6 +1839,8 @@ document.getElementById("importFile").onchange = async e => {
 };
 
 normalizeAchievementData();
+evaluateAchievements();
+localStorage.setItem(KEY, JSON.stringify(data));
 render();
 renderAchievements();
 if (data.achievementQueue.length) setTimeout(showNextAchievement, 700);
