@@ -463,6 +463,52 @@ input:focus { border-color: var(--gold); }
   }
   .actions { margin-left: 54px; }
 }
+
+/* Авторская система достижений LEVEL UP YOURSELF */
+.achievement-toolbar { display:flex; align-items:center; justify-content:space-between; gap:12px; margin:20px 0 14px; }
+.achievement-summary { color:var(--muted); font-size:12px; }
+.achievement-category { margin:22px 0 10px; color:var(--gold-light); font:500 18px Georgia,serif; }
+.achievement-grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:10px; }
+.achievement-card { display:flex; gap:11px; align-items:center; min-width:0; padding:13px; border:1px solid var(--line); border-radius:15px; background:linear-gradient(145deg,#14352b,#0d211e); }
+.achievement-card.locked { opacity:.58; filter:saturate(.45); }
+.achievement-mark { width:48px; height:48px; flex:none; display:grid; place-items:center; border-radius:14px; font-size:23px; border:1px solid currentColor; background:#071b17; }
+.achievement-mark.bronze { color:#d5a06d; background:linear-gradient(145deg,#513a29,#1a211d); }
+.achievement-mark.silver { color:#d5e0df; background:linear-gradient(145deg,#46585a,#1a2524); }
+.achievement-mark.gold { color:#f0d28a; background:linear-gradient(145deg,#66552d,#25261d); }
+.achievement-info { min-width:0; flex:1; }
+.achievement-name { font:500 15px Georgia,serif; overflow-wrap:anywhere; }
+.achievement-desc { color:var(--muted); font-size:11px; line-height:1.4; margin-top:4px; }
+.achievement-meta { display:flex; flex-wrap:wrap; gap:6px; align-items:center; margin-top:6px; }
+.achievement-rarity { font-size:9px; letter-spacing:1px; text-transform:uppercase; }
+.achievement-date { color:#8fa096; font-size:10px; }
+.achievement-progress { height:4px; background:#071611; border-radius:8px; overflow:hidden; margin-top:8px; }
+.achievement-progress > span { display:block; height:100%; background:linear-gradient(90deg,#a9853e,var(--gold-light)); }
+.achievement-count { color:var(--gold-light); font-size:12px; white-space:nowrap; }
+.achievement-empty { color:var(--muted); text-align:center; padding:22px 10px; }
+.unlock-layer { position:fixed; inset:0; z-index:1000; display:flex; align-items:center; justify-content:center; padding:20px; background:#020907b8; backdrop-filter:blur(5px); opacity:0; pointer-events:none; transition:opacity .35s ease; }
+.unlock-layer.visible { opacity:1; pointer-events:auto; }
+.unlock-card { width:min(420px,100%); padding:27px 22px 24px; text-align:center; border:1px solid #d7b66b88; border-radius:22px; background:radial-gradient(ellipse at 50% 0%,#285044,#102720 58%,#091914); box-shadow:0 25px 80px #000b,0 0 35px #d7b66b20; transform:translateY(24px) scale(.96); transition:transform .45s cubic-bezier(.2,.8,.2,1); }
+.unlock-layer.visible .unlock-card { transform:translateY(0) scale(1); }
+.unlock-eyebrow { color:var(--gold); font-size:10px; letter-spacing:3px; text-transform:uppercase; }
+.unlock-emblem { width:104px; height:104px; margin:16px auto; display:grid; place-items:center; border-radius:30px; font-size:48px; border:1px solid currentColor; box-shadow:0 0 35px currentColor; animation:emblemReveal .75s cubic-bezier(.2,.8,.2,1) both; }
+.unlock-emblem.bronze { color:#d5a06d; background:linear-gradient(145deg,#513a29,#1a211d); }
+.unlock-emblem.silver { color:#d5e0df; background:linear-gradient(145deg,#46585a,#1a2524); }
+.unlock-emblem.gold { color:#f0d28a; background:linear-gradient(145deg,#66552d,#25261d); }
+.unlock-emblem.platinum { color:#e5f0f0; background:linear-gradient(145deg,#627b7c,#152b2d); box-shadow:0 0 55px #d7f1ff88; }
+.unlock-title { color:var(--gold-light); font:500 25px Georgia,serif; margin:7px 0; }
+.unlock-desc { color:var(--muted); font-size:13px; line-height:1.5; }
+.unlock-rarity { margin-top:14px; color:var(--gold); font-size:10px; letter-spacing:2px; text-transform:uppercase; }
+.unlock-platinum .unlock-card { border-color:#dceeff; background:radial-gradient(ellipse at 50% 0%,#48666a,#172c2d 55%,#081719); box-shadow:0 25px 100px #000d,0 0 65px #c9efff55; }
+.unlock-platinum .unlock-eyebrow,.unlock-platinum .unlock-title { color:#e8f5ff; }
+.unlock-platinum .unlock-title { font-size:clamp(21px,6vw,29px); letter-spacing:1px; }
+.unlock-platinum .unlock-desc { color:#d0e1e2; }
+.unlock-platinum .unlock-emblem { width:132px; height:132px; font-size:62px; animation:platinumReveal 1.2s cubic-bezier(.16,.8,.2,1) both; }
+@keyframes emblemReveal { 0%{opacity:0;transform:rotate(-18deg) scale(.35)} 65%{opacity:1;transform:rotate(7deg) scale(1.12)} 100%{transform:rotate(0) scale(1)} }
+@keyframes platinumReveal { 0%{opacity:0;transform:rotate(-35deg) scale(.15);filter:brightness(2)} 65%{opacity:1;transform:rotate(8deg) scale(1.18);filter:brightness(1.6)} 100%{transform:rotate(0) scale(1);filter:brightness(1)} }
+@media(max-width:430px) { .achievement-grid { grid-template-columns:1fr; } .achievement-card { padding:11px; } .unlock-card { padding:23px 17px; } }
+@media(prefers-reduced-motion:reduce) { .unlock-layer,.unlock-card { transition:none; } .unlock-emblem { animation:none; } }
+
+
 </style>
 </head>
 
@@ -504,6 +550,10 @@ input:focus { border-color: var(--gold); }
   <div class="footer">
     <button class="btn secondary small" id="statsBtn">
       ◷ Статистика
+    </button>
+
+    <button class="btn secondary small" id="achievementsBtn">
+      ✧ Достижения
     </button>
 
     <button class="btn secondary small" id="resetProgressBtn">
@@ -632,6 +682,33 @@ input:focus { border-color: var(--gold); }
     </div>
     <div id="historyLog"></div>
   </section>
+
+<section id="achievements" class="hidden">
+  <button class="back" id="backFromAchievements">← На главную</button>
+  <div class="crumb">LEVEL UP YOURSELF / ДОСТИЖЕНИЯ</div>
+  <section class="panel">
+    <div class="section-head" style="margin-top:0">
+      <h2>Мои достижения</h2>
+      <div class="achievement-count" id="achievementCount">0 / 36</div>
+    </div>
+    <div class="track"><div class="fill" id="achievementOverallFill"></div></div>
+    <div class="achievement-summary" id="achievementSummary" style="margin-top:9px">История твоих побед</div>
+    <div id="achievementList"></div>
+    <div id="platinumStatus"></div>
+  </section>
+</section>
+
+<div class="unlock-layer" id="unlockLayer" aria-live="polite" aria-atomic="true">
+  <div class="unlock-card">
+    <div class="unlock-eyebrow" id="unlockEyebrow">Новое достижение</div>
+    <div class="unlock-emblem" id="unlockEmblem">✦</div>
+    <div class="unlock-title" id="unlockTitle"></div>
+    <div class="unlock-desc" id="unlockDescription"></div>
+    <div class="unlock-rarity" id="unlockRarity"></div>
+  </div>
+</div>
+
+
 </section>
 
 </div>
@@ -659,10 +736,271 @@ function load() {
   }
 }
 
+
+const achievementCatalog = [
+  {id:"first_start",category:"Первые шаги",name:"Начало пути",description:"Выполнить первую задачу",icon:"🌱",rarity:"bronze"},
+  {id:"first_five",category:"Первые шаги",name:"Первый шаг",description:"Выполнить 5 задач",icon:"🚶",rarity:"bronze"},
+  {id:"first_ten",category:"Первые шаги",name:"В движении",description:"Выполнить 10 задач",icon:"🧭",rarity:"bronze"},
+  {id:"first_25",category:"Первые шаги",name:"Разгон",description:"Выполнить 25 задач",icon:"⚡",rarity:"silver"},
+  {id:"first_50",category:"Первые шаги",name:"Втянулся",description:"Выполнить 50 задач",icon:"🔥",rarity:"silver"},
+  {id:"first_100",category:"Первые шаги",name:"Сотня успехов",description:"Выполнить 100 задач",icon:"💯",rarity:"gold"},
+
+  {id:"discipline_1",category:"Железная дисциплина",name:"Первый день",description:"Заниматься один день",icon:"📅",rarity:"bronze"},
+  {id:"discipline_3",category:"Железная дисциплина",name:"Три дня подряд",description:"Заниматься 3 дня подряд",icon:"🔥",rarity:"bronze"},
+  {id:"discipline_7",category:"Железная дисциплина",name:"Неделя силы",description:"Заниматься 7 дней подряд",icon:"🗓️",rarity:"bronze"},
+  {id:"discipline_14",category:"Железная дисциплина",name:"Две недели",description:"Заниматься 14 дней подряд",icon:"💪",rarity:"silver"},
+  {id:"discipline_30",category:"Железная дисциплина",name:"Месяц дисциплины",description:"Заниматься 30 дней подряд",icon:"🦾",rarity:"gold"},
+  {id:"discipline_60",category:"Железная дисциплина",name:"Несгибаемый",description:"Заниматься 60 дней подряд",icon:"👑",rarity:"gold"},
+
+  {id:"direction_25",category:"Мастер направлений",name:"Специалист",description:"Довести одно направление до 25%",icon:"🧠",rarity:"bronze"},
+  {id:"direction_50",category:"Мастер направлений",name:"Развитие",description:"Довести одно направление до 50%",icon:"📈",rarity:"bronze"},
+  {id:"direction_75",category:"Мастер направлений",name:"Эксперт",description:"Довести одно направление до 75%",icon:"🥇",rarity:"silver"},
+  {id:"direction_100",category:"Мастер направлений",name:"Мастер",description:"Полностью завершить одно направление",icon:"🏅",rarity:"gold"},
+  {id:"direction_3",category:"Мастер направлений",name:"Универсал",description:"Выполнить задачи в 3 направлениях",icon:"🌟",rarity:"silver"},
+  {id:"direction_5",category:"Мастер направлений",name:"Многогранный",description:"Выполнить задачи в 5 направлениях",icon:"🌍",rarity:"gold"},
+
+  {id:"all_50",category:"Великие свершения",name:"Полпути",description:"Выполнить 50% всех основных задач",icon:"🏅",rarity:"bronze"},
+  {id:"all_75",category:"Великие свершения",name:"Почти у цели",description:"Выполнить 75% всех основных задач",icon:"🏆",rarity:"silver"},
+  {id:"all_100",category:"Великие свершения",name:"Совершенство",description:"Выполнить 100% всех основных задач",icon:"💎",rarity:"gold"},
+  {id:"daily_3",category:"Великие свершения",name:"Первый рывок",description:"Выполнить 3 задачи за один день",icon:"🚀",rarity:"bronze"},
+  {id:"weekly_5",category:"Великие свершения",name:"Хороший темп",description:"Выполнить 5 задач за неделю",icon:"⚔️",rarity:"silver"},
+  {id:"three_peaks",category:"Великие свершения",name:"Покоритель вершин",description:"Полностью завершить 3 направления",icon:"🏰",rarity:"gold"},
+
+  {id:"subtask_1",category:"Подзадачи",name:"Детализация",description:"Выполнить первую подзадачу",icon:"🧩",rarity:"bronze"},
+  {id:"subtask_10",category:"Подзадачи",name:"Мастер деталей",description:"Выполнить 10 подзадач",icon:"🔧",rarity:"bronze"},
+  {id:"subtask_25",category:"Подзадачи",name:"Архитектор",description:"Выполнить 25 подзадач",icon:"🛠️",rarity:"bronze"},
+  {id:"subtask_50",category:"Подзадачи",name:"Терпение",description:"Выполнить 50 подзадач",icon:"💪",rarity:"silver"},
+  {id:"subtask_100",category:"Подзадачи",name:"Системный подход",description:"Выполнить 100 подзадач",icon:"🧠",rarity:"gold"},
+  {id:"subtask_order",category:"Подзадачи",name:"Абсолютный порядок",description:"Завершить все подзадачи одного направления",icon:"👑",rarity:"gold"},
+
+  {id:"secret_clean",category:"Секретные достижения",name:"Чистый лист",description:"Полностью завершить все задачи одного направления",icon:"🧹",rarity:"gold",secret:true},
+  {id:"secret_slow",category:"Секретные достижения",name:"Тише едешь — дальше будешь",description:"Выполнять хотя бы одну задачу 3 дня подряд",icon:"🐢",rarity:"bronze",secret:true},
+  {id:"secret_aim",category:"Секретные достижения",name:"Меткий стрелок",description:"Выполнить 3 подзадачи из разных направлений",icon:"🎯",rarity:"silver",secret:true},
+  {id:"secret_puzzle",category:"Секретные достижения",name:"Разгадчик",description:"Полностью завершить одну задачу со всеми её подзадачами",icon:"🧩",rarity:"bronze",secret:true},
+  {id:"secret_pioneer",category:"Секретные достижения",name:"Первопроходец",description:"Создать новое направление",icon:"🌟",rarity:"silver",secret:true},
+  {id:"secret_no_retreat",category:"Секретные достижения",name:"Без отступления",description:"Выполнить 3 подзадачи за один день",icon:"💪",rarity:"silver",secret:true}
+];
+const platinumAchievement = {id:"platinum",name:"LEVEL-UP-YOURSELF",description:"Получить все 36 обычных и секретных достижений",icon:"♛",rarity:"platinum"};
+
+function normalizeAchievementData() {
+  if (!data.achievements || typeof data.achievements !== "object") data.achievements = {};
+  if (!Array.isArray(data.achievementQueue)) data.achievementQueue = [];
+  if (!data.meta || typeof data.meta !== "object") data.meta = {};
+  if (!Number.isFinite(data.meta.createdDirections)) data.meta.createdDirections = 0;
+}
+
+function collectTaskStats() {
+  const rootTasks = [];
+  const subTasks = [];
+  const completedEvents = (data.history || []).filter(e => e && e.type === "completed" && !Number.isNaN(new Date(e.timestamp).getTime()));
+  const uniqueCompleted = new Map();
+  completedEvents.forEach(e => uniqueCompleted.set((e.areaId || "") + ":" + (e.taskId || ""), e));
+  const days = new Set();
+  completedEvents.forEach(e => days.add(dateKey(new Date(e.timestamp))));
+  const sortedDays = [...days].sort();
+  let streak = 0;
+  let previous = null;
+  sortedDays.forEach(key => {
+    const current = new Date(key + "T12:00:00");
+    if (previous && Math.round((current - previous) / 86400000) === 1) streak++;
+    else streak = 1;
+    previous = current;
+  });
+  const today = dateKey(new Date());
+  const todayEvents = completedEvents.filter(e => dateKey(new Date(e.timestamp)) === today);
+  const weekStart = new Date(); weekStart.setHours(0,0,0,0); weekStart.setDate(weekStart.getDate()-6);
+  const weekEvents = completedEvents.filter(e => new Date(e.timestamp) >= weekStart);
+  const activeAreaIds = new Set(completedEvents.map(e => e.areaId).filter(Boolean));
+  let completeDirections = 0;
+  let cleanDirection = false;
+  let absoluteOrder = false;
+  let puzzleComplete = false;
+  let directionMax = 0;
+
+  function walk(nodes, depth, areaId) {
+    (nodes || []).forEach(node => {
+      if (depth > 0) subTasks.push(node);
+      if (node.children && node.children.length) walk(node.children, depth + 1, areaId);
+    });
+  }
+
+  data.areas.forEach(area => {
+    const roots = Array.isArray(area.tasks) ? area.tasks : [];
+    roots.forEach(node => rootTasks.push({node,area}));
+    walk(roots, 0, area.id);
+    const t = totals(roots);
+    const pct = t.total ? Math.round(t.done / t.total * 100) : 0;
+    directionMax = Math.max(directionMax, pct);
+    if (roots.length && roots.every(isNodeComplete)) {
+      completeDirections++;
+      cleanDirection = true;
+    }
+    if (roots.length && roots.every(isNodeComplete) && roots.some(n => n.children && n.children.length)) absoluteOrder = true;
+    const inspectPuzzle = nodes => (nodes || []).forEach(node => {
+      if (node.children && node.children.length && node.children.every(isNodeComplete)) puzzleComplete = true;
+      inspectPuzzle(node.children);
+    });
+    inspectPuzzle(roots);
+  });
+
+  const completedRoots = rootTasks.filter(x => isNodeComplete(x.node)).length;
+  const rootTotal = rootTasks.length;
+  const doneSubtasks = subTasks.filter(n => !!n.done).length;
+  const completedSubtaskEvents = completedEvents.filter(e => {
+    const area = data.areas.find(a => a.id === e.areaId);
+    if (!area) return false;
+    const rootIds = new Set((area.tasks || []).map(t => t.id));
+    return !rootIds.has(e.taskId);
+  });
+  const subtaskIds = new Set(completedSubtaskEvents.map(e => (e.areaId || "") + ":" + (e.taskId || "")));
+  const subtaskAreas = new Set(completedSubtaskEvents.map(e => e.areaId).filter(Boolean));
+  const daySubtasks = new Set(completedSubtaskEvents.filter(e => dateKey(new Date(e.timestamp)) === today).map(e => (e.areaId || "") + ":" + (e.taskId || "")));
+  const taskCount = uniqueCompleted.size;
+  const rootPercent = rootTotal ? Math.round(completedRoots / rootTotal * 100) : 0;
+  const directionPercents = data.areas.map(a => {
+    const t = totals(a.tasks);
+    return t.total ? Math.round(t.done / t.total * 100) : 0;
+  });
+  return {completedEvents,uniqueCompleted,days,streak,todayEvents,weekEvents,activeAreaIds,completeDirections,cleanDirection,absoluteOrder,puzzleComplete,rootTasks,rootTotal,completedRoots,rootPercent,subTasks,doneSubtasks,subtaskIds,subtaskAreas,daySubtasks,taskCount,directionPercents,directionMax};
+}
+
+function achievementCondition(id, st) {
+  const has = n => st.taskCount >= n;
+  const sub = n => st.subtaskIds.size >= n;
+  const hasDirection = n => st.activeAreaIds.size >= n;
+  switch(id) {
+    case "first_start": return has(1);
+    case "first_five": return has(5);
+    case "first_ten": return has(10);
+    case "first_25": return has(25);
+    case "first_50": return has(50);
+    case "first_100": return has(100);
+    case "discipline_1": return st.days.size >= 1;
+    case "discipline_3": case "secret_slow": return st.streak >= 3;
+    case "discipline_7": return st.streak >= 7;
+    case "discipline_14": return st.streak >= 14;
+    case "discipline_30": return st.streak >= 30;
+    case "discipline_60": return st.streak >= 60;
+    case "direction_25": return st.directionPercents.some(p => p >= 25);
+    case "direction_50": return st.directionPercents.some(p => p >= 50);
+    case "direction_75": return st.directionPercents.some(p => p >= 75);
+    case "direction_100": return st.directionPercents.some(p => p === 100);
+    case "direction_3": return hasDirection(3);
+    case "direction_5": return hasDirection(5);
+    case "all_50": return st.rootTotal > 0 && st.rootPercent >= 50;
+    case "all_75": return st.rootTotal > 0 && st.rootPercent >= 75;
+    case "all_100": return st.rootTotal > 0 && st.rootPercent === 100;
+    case "daily_3": return new Set(st.todayEvents.map(e => (e.areaId||"")+":"+(e.taskId||""))).size >= 3;
+    case "weekly_5": return new Set(st.weekEvents.map(e => (e.areaId||"")+":"+(e.taskId||""))).size >= 5;
+    case "three_peaks": return st.completeDirections >= 3;
+    case "subtask_1": return sub(1);
+    case "subtask_10": return sub(10);
+    case "subtask_25": return sub(25);
+    case "subtask_50": return sub(50);
+    case "subtask_100": return sub(100);
+    case "subtask_order": return st.absoluteOrder;
+    case "secret_clean": return st.cleanDirection;
+    case "secret_aim": return st.subtaskAreas.size >= 3;
+    case "secret_puzzle": return st.puzzleComplete;
+    case "secret_pioneer": return (data.meta.createdDirections || 0) >= 1;
+    case "secret_no_retreat": return st.daySubtasks.size >= 3;
+    default: return false;
+  }
+}
+
+function enqueueAchievement(id) {
+  normalizeAchievementData();
+  if (!data.achievementQueue.includes(id)) data.achievementQueue.push(id);
+}
+
+function evaluateAchievements() {
+  normalizeAchievementData();
+  const stats = collectTaskStats();
+  const newly = [];
+  achievementCatalog.forEach(item => {
+    if (!data.achievements[item.id] && achievementCondition(item.id, stats)) {
+      data.achievements[item.id] = new Date().toISOString();
+      enqueueAchievement(item.id);
+      newly.push(item.id);
+    }
+  });
+  const allUnlocked = achievementCatalog.every(item => !!data.achievements[item.id]);
+  if (allUnlocked && !data.achievements.platinum) {
+    data.achievements.platinum = new Date().toISOString();
+    enqueueAchievement("platinum");
+    newly.push("platinum");
+  }
+  return newly;
+}
+
+let unlockTimer = null;
+let unlockBusy = false;
+
+function showNextAchievement() {
+  normalizeAchievementData();
+  if (unlockBusy || !data.achievementQueue.length) return;
+  const id = data.achievementQueue[0];
+  const item = id === "platinum" ? platinumAchievement : achievementCatalog.find(a => a.id === id);
+  if (!item) { data.achievementQueue.shift(); localStorage.setItem(KEY,JSON.stringify(data)); showNextAchievement(); return; }
+  unlockBusy = true;
+  const layer = document.getElementById("unlockLayer");
+  layer.classList.toggle("unlock-platinum", id === "platinum");
+  const emblem = document.getElementById("unlockEmblem");
+  emblem.className = "unlock-emblem " + item.rarity;
+  emblem.textContent = item.icon;
+  document.getElementById("unlockEyebrow").textContent = id === "platinum" ? "Высшая награда" : "Новое достижение";
+  document.getElementById("unlockTitle").textContent = item.name;
+  document.getElementById("unlockDescription").textContent = item.description;
+  document.getElementById("unlockRarity").textContent = id === "platinum" ? "PLATINUM TROPHY" : ({bronze:"Бронзовый трофей",silver:"Серебряный трофей",gold:"Золотой трофей"}[item.rarity]);
+  layer.classList.add("visible");
+  unlockTimer = setTimeout(() => {
+    layer.classList.remove("visible");
+    data.achievementQueue.shift();
+    localStorage.setItem(KEY,JSON.stringify(data));
+    unlockBusy = false;
+    unlockTimer = setTimeout(showNextAchievement, 3000);
+  }, 3000);
+}
+
+function renderAchievements() {
+  normalizeAchievementData();
+  const unlocked = achievementCatalog.filter(a => !!data.achievements[a.id]).length;
+  document.getElementById("achievementCount").textContent = unlocked + " / 36";
+  document.getElementById("achievementOverallFill").style.width = (unlocked / 36 * 100) + "%";
+  document.getElementById("achievementSummary").textContent = "Открыто трофеев: " + unlocked + " из 36 · Платина — отдельная высшая награда";
+  const list = document.getElementById("achievementList");
+  const categories = [...new Set(achievementCatalog.map(a => a.category))];
+  list.innerHTML = categories.map(category => {
+    const items = achievementCatalog.filter(a => a.category === category);
+    return '<div class="achievement-category">' + escapeHTML(category) + '</div><div class="achievement-grid">' +
+      items.map(item => {
+        const date = data.achievements[item.id];
+        const hiddenSecret = item.secret && !date;
+        const title = hiddenSecret ? "Секретное достижение" : item.name;
+        const description = hiddenSecret ? "Условия откроются после получения награды." : item.description;
+        const rarityName = ({bronze:"Бронза",silver:"Серебро",gold:"Золото"})[item.rarity];
+        const dateLabel = date ? new Date(date).toLocaleDateString("ru-RU") : "Ещё впереди";
+        return '<article class="achievement-card ' + (date ? "" : "locked") + '">' +
+          '<div class="achievement-mark ' + item.rarity + '">' + (hiddenSecret ? "?" : item.icon) + '</div>' +
+          '<div class="achievement-info"><div class="achievement-name">' + escapeHTML(title) + '</div>' +
+          '<div class="achievement-desc">' + escapeHTML(description) + '</div>' +
+          '<div class="achievement-meta"><span class="achievement-rarity">' + rarityName + '</span><span class="achievement-date">' + dateLabel + '</span></div></div></article>';
+      }).join("") + '</div>';
+  }).join("");
+  const platinumDate = data.achievements.platinum;
+  document.getElementById("platinumStatus").innerHTML = '<div class="achievement-category">Высшая награда</div><article class="achievement-card ' + (platinumDate ? "" : "locked") + '">' +
+    '<div class="achievement-mark ' + (platinumDate ? "platinum" : "silver") + '">' + (platinumDate ? "♛" : "◇") + '</div>' +
+    '<div class="achievement-info"><div class="achievement-name">LEVEL-UP-YOURSELF</div><div class="achievement-desc">Платина за все 36 достижений, включая секретные.</div><div class="achievement-meta"><span class="achievement-rarity">ПЛАТИНА</span><span class="achievement-date">' + (platinumDate ? new Date(platinumDate).toLocaleDateString("ru-RU") : "Ещё впереди") + '</span></div></div></article>';
+}
+
+
 function save() {
   if (!Array.isArray(data.history)) data.history = [];
+  normalizeAchievementData();
+  evaluateAchievements();
   localStorage.setItem(KEY, JSON.stringify(data));
   render();
+  showNextAchievement();
 }
 
 function addHistoryEvent(type, area, task) {
@@ -1221,7 +1559,8 @@ document.getElementById("addArea").onclick = () => {
       name,
       tasks: []
     });
-
+    normalizeAchievementData();
+    data.meta.createdDirections = (data.meta.createdDirections || 0) + 1;
     save();
   });
 };
@@ -1276,6 +1615,20 @@ function backFromStatistics() {
 document.getElementById("statsBtn").onclick = showStatistics;
 document.getElementById("backFromStats").onclick = backFromStatistics;
 
+function showAchievements() {
+  document.getElementById("home").classList.add("hidden");
+  document.getElementById("detail").classList.add("hidden");
+  document.getElementById("statistics").classList.add("hidden");
+  document.getElementById("achievements").classList.remove("hidden");
+  renderAchievements();
+}
+function backFromAchievements() {
+  document.getElementById("achievements").classList.add("hidden");
+  document.getElementById("home").classList.remove("hidden");
+}
+document.getElementById("achievementsBtn").onclick = showAchievements;
+document.getElementById("backFromAchievements").onclick = backFromAchievements;
+
 // Сбрасывает только прогресс: направления и задачи остаются на месте.
 function resetTaskProgress(nodes) {
   (nodes || []).forEach(task => {
@@ -1295,6 +1648,8 @@ document.getElementById("resetProgressBtn").onclick = () => {
 
   data.areas.forEach(area => resetTaskProgress(area.tasks));
   data.history = [];
+  // Уже полученные трофеи остаются в личной коллекции после сброса прогресса.
+  normalizeAchievementData();
   statsAreaId = null;
   save();
   alert("Прогресс обнулён. Можно начинать новый этап!");
@@ -1345,9 +1700,12 @@ function copyTaskForBackup(task) {
 document.getElementById("exportBtn").onclick = () => {
   const backup = {
     app: "LEVEL UP YOURSELF",
-    version: 3,
+    version: 4,
     exportedAt: new Date().toISOString(),
     history: (data.history || []).map(event => ({ ...event })),
+    achievements: { ...(data.achievements || {}) },
+    achievementQueue: [...(data.achievementQueue || [])],
+    meta: { ...(data.meta || {}) },
     areas: (data.areas || []).map(area => ({
       id: area.id || uid(),
       name: String(area.name || ""),
@@ -1448,11 +1806,29 @@ document.getElementById("importFile").onchange = async e => {
       "Импортировать " + restoredAreas.length + " направлений и " +
       taskCount + " задач/подзадач? Текущие данные будут заменены."
     )) {
-      data = { areas: restoredAreas, history: restoredHistory };
+      const restoredAchievements = imported.achievements && typeof imported.achievements === "object"
+        ? imported.achievements : {};
+      const validAchievementIds = new Set([...achievementCatalog.map(a => a.id), "platinum"]);
+      const cleanAchievements = {};
+      Object.keys(restoredAchievements).forEach(id => {
+        if (validAchievementIds.has(id) && typeof restoredAchievements[id] === "string") cleanAchievements[id] = restoredAchievements[id];
+      });
+      const restoredQueue = Array.isArray(imported.achievementQueue)
+        ? imported.achievementQueue.filter(id => validAchievementIds.has(id)) : [];
+      const restoredMeta = imported.meta && typeof imported.meta === "object" ? imported.meta : {};
+      data = {
+        areas: restoredAreas,
+        history: restoredHistory,
+        achievements: cleanAchievements,
+        achievementQueue: restoredQueue,
+        meta: { createdDirections: Number.isFinite(restoredMeta.createdDirections) ? restoredMeta.createdDirections : restoredAreas.length }
+      };
       save();
+      renderAchievements();
       alert("Импорт завершён: загружено " + restoredAreas.length +
-        " направлений, " + taskCount + " задач/подзадач и " +
-        restoredHistory.length + " записей истории.");
+        " направлений, " + taskCount + " задач/подзадач, " +
+        restoredHistory.length + " записей истории и " +
+        Object.keys(cleanAchievements).length + " достижений.");
     }
   } catch (error) {
     alert("Не удалось импортировать копию: " +
@@ -1462,7 +1838,10 @@ document.getElementById("importFile").onchange = async e => {
   e.target.value = "";
 };
 
+normalizeAchievementData();
 render();
+renderAchievements();
+if (data.achievementQueue.length) setTimeout(showNextAchievement, 700);
 </script>
 </body>
 </html>
