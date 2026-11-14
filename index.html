@@ -943,7 +943,7 @@ const achievementCatalog = [
   {id:"secret_slow",category:"Секретные достижения",name:"Тише едешь — дальше будешь",description:"Выполнять хотя бы одну задачу 3 дня подряд",icon:"🐢",rarity:"bronze",secret:true},
   {id:"secret_aim",category:"Секретные достижения",name:"Меткий стрелок",description:"Выполнить 3 подзадачи из разных направлений",icon:"🎯",rarity:"silver",secret:true},
   {id:"secret_puzzle",category:"Секретные достижения",name:"Разгадчик",description:"Полностью завершить 5 задач со всеми их подзадачами",icon:"🧩",rarity:"bronze",secret:true},
-  {id:"secret_pioneer",category:"Секретные достижения",name:"Первопроходец",description:"Создать новое направление",icon:"🌟",rarity:"silver",secret:true},
+  {id:"secret_pioneer",category:"Секретные достижения",name:"Коллекционер",description:"Получить 33 достижения",icon:"🏆",rarity:"gold",secret:true},
   {id:"secret_no_retreat",category:"Секретные достижения",name:"Без отступления",description:"Выполнить 5 полных задач за 3 месяца",icon:"💪",rarity:"silver",secret:true}
 ];
 const platinumAchievement = {id:"platinum",name:"LEVEL-UP-YOURSELF",description:"Получить все 36 обычных и секретных достижений",icon:"♛",rarity:"platinum"};
@@ -1077,7 +1077,7 @@ function achievementCondition(id, st) {
     case "secret_clean": return st.completeDirections >= 3;
     case "secret_aim": return st.subtaskAreas.size >= 3;
     case "secret_puzzle": return st.fullyCompletedRootTasks >= 5;
-    case "secret_pioneer": return (data.meta.createdDirections || 0) >= 1;
+    case "secret_pioneer": return achievementCatalog.filter(item => item.id !== "secret_pioneer" && !!data.achievements[item.id]).length >= 33;
     case "secret_no_retreat": return new Set(st.threeMonthsFullTasks.map(e => (e.areaId||"")+":"+(e.taskId||""))).size >= 5;
     default: return false;
   }
