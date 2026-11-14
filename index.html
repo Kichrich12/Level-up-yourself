@@ -1662,13 +1662,32 @@ document.getElementById("resetProgressBtn").onclick = () => {
 
   if (!confirmed) return;
 
+  const resetAchievements = confirm(
+    "Обнулить также все достижения?\n\n" +
+    "ОК — сбросить достижения и платину.\n" +
+    "Отмена — сохранить уже полученные достижения."
+  );
+
   data.areas.forEach(area => resetTaskProgress(area.tasks));
   data.history = [];
-  // Уже полученные трофеи остаются в личной коллекции после сброса прогресса.
+
   normalizeAchievementData();
+  if (resetAchievements) {
+    data.achievements = {};
+    data.achievementQueue = [];
+    data.meta.createdDirections = 0;
+    if (unlockTimer) clearTimeout(unlockTimer);
+    unlockTimer = null;
+    unlockBusy = false;
+    const unlockLayer = document.getElementById("unlockLayer");
+    if (unlockLayer) unlockLayer.classList.remove("visible", "unlock-platinum");
+  }
+
   statsAreaId = null;
   save();
-  alert("Прогресс обнулён. Можно начинать новый этап!");
+  alert(resetAchievements
+    ? "Прогресс и достижения полностью обнулены. Можно начинать новый этап!"
+    : "Прогресс обнулён, достижения сохранены. Можно начинать новый этап!");
 };
 
 function addRootTask() {
