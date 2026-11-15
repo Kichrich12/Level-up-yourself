@@ -1747,8 +1747,12 @@ function makeNode(node, list, parent = null, ancestors = []) {
     </div>
 
     <div class="item-tools">
-      <button class="iconbtn" data-addchild title="Добавить подзадачу">
+      <button class="iconbtn" data-addchild title="Добавить подзадачу вручную">
         ＋
+      </button>
+
+      <button class="iconbtn" data-addnumbered title="Создать нумерованные подзадачи">
+        №
       </button>
 
       <button class="iconbtn" data-edit title="Изменить">
@@ -1809,6 +1813,32 @@ function makeNode(node, list, parent = null, ancestors = []) {
 
       save();
     });
+  };
+
+  row.querySelector("[data-addnumbered]").onclick = () => {
+    const rawCount = prompt("Сколько подзадач создать? (например, 20)", "10");
+    if (rawCount === null) return;
+    const count = Number(rawCount);
+    if (!Number.isInteger(count) || count < 1 || count > 500) {
+      alert("Введи целое число от 1 до 500.");
+      return;
+    }
+
+    const prefixAnswer = prompt("Как назвать подзадачи? Например: Глава. Оставь пустым, чтобы создать только номера.", "Глава");
+    if (prefixAnswer === null) return;
+    const prefix = prefixAnswer.trim();
+    node.children = node.children || [];
+
+    for (let i = 1; i <= count; i++) {
+      node.children.push({
+        id: uid(),
+        name: prefix ? prefix + " " + i : String(i),
+        done: false,
+        children: []
+      });
+    }
+
+    save();
   };
 
   row.querySelector("[data-edit]").onclick = () => {
